@@ -451,25 +451,25 @@ Requires(post):   %{_sbindir}/alternatives
 Requires(postun): %{_sbindir}/alternatives
 
 # Standard JPackage base provides.
-Provides: jre7-%{javaver}-%{origin} = %{epoch}:%{version}-%{release}
-Provides: jre7-%{origin} = %{epoch}:%{version}-%{release}
-Provides: jre7-%{javaver} = %{epoch}:%{version}-%{release}
-Provides: java7-%{javaver} = %{epoch}:%{version}-%{release}
-Provides: jre7 = %{javaver}
-Provides: java7-%{origin} = %{epoch}:%{version}-%{release}
-Provides: java7 = %{epoch}:%{javaver}
+Provides: jre-%{javaver}-%{origin} = %{epoch}:%{version}-%{release}
+Provides: jre-%{origin} = %{epoch}:%{version}-%{release}
+Provides: jre-%{javaver} = %{epoch}:%{version}-%{release}
+Provides: java-%{javaver} = %{epoch}:%{version}-%{release}
+Provides: jre = %{javaver}
+Provides: java-%{origin} = %{epoch}:%{version}-%{release}
+Provides: java = %{epoch}:%{javaver}
 # Standard JPackage extensions provides.
-Provides: jndi7 = %{epoch}:%{version}
-Provides: jndi7-ldap = %{epoch}:%{version}
-Provides: jndi7-cos = %{epoch}:%{version}
-Provides: jndi7-rmi = %{epoch}:%{version}
-Provides: jndi7-dns = %{epoch}:%{version}
-Provides: jaas7 = %{epoch}:%{version}
-Provides: jsse7 = %{epoch}:%{version}
-Provides: jce7 = %{epoch}:%{version}
-Provides: jdbc7-stdext = 3.0
-Provides: java7-sasl = %{epoch}:%{version}
-Provides: java7-fonts = %{epoch}:%{version}
+Provides: jndi = %{epoch}:%{version}
+Provides: jndi-ldap = %{epoch}:%{version}
+Provides: jndi-cos = %{epoch}:%{version}
+Provides: jndi-rmi = %{epoch}:%{version}
+Provides: jndi-dns = %{epoch}:%{version}
+Provides: jaas = %{epoch}:%{version}
+Provides: jsse = %{epoch}:%{version}
+Provides: jce = %{epoch}:%{version}
+Provides: jdbc-stdext = 4.1
+Provides: java-sasl = %{epoch}:%{version}
+Provides: java-fonts = %{epoch}:%{version}
 
 %description
 The OpenJDK runtime environment.
@@ -486,13 +486,13 @@ Requires(post):   %{_sbindir}/alternatives
 Requires(postun): %{_sbindir}/alternatives
 
 # Standard JPackage devel provides.
-Provides: java7-sdk-%{javaver}-%{origin} = %{epoch}:%{version}
-Provides: java7-sdk-%{javaver} = %{epoch}:%{version}
-Provides: java7-sdk-%{origin} = %{epoch}:%{version}
-Provides: java7-sdk = %{epoch}:%{javaver}
-Provides: java7-%{javaver}-devel = %{epoch}:%{version}
-Provides: java7-devel-%{origin} = %{epoch}:%{version}
-Provides: java7-devel = %{epoch}:%{javaver}
+Provides: java-sdk-%{javaver}-%{origin} = %{epoch}:%{version}
+Provides: java-sdk-%{javaver} = %{epoch}:%{version}
+Provides: java-sdk-%{origin} = %{epoch}:%{version}
+Provides: java-sdk = %{epoch}:%{javaver}
+Provides: java-%{javaver}-devel = %{epoch}:%{version}
+Provides: java-devel-%{origin} = %{epoch}:%{version}
+Provides: java-devel = %{epoch}:%{javaver}
 
 
 %description devel
@@ -1312,6 +1312,7 @@ exit 0
 %changelog
 * Sun Nov 06 2011 Deepak Bhole <dbhole@redhat.com> - 1.7.0.1-2.0.2
 - Added missing changelog entry
+- Updated Provides
 
 * Sun Nov 06 2011 Deepak Bhole <dbhole@redhat.com> - 1.7.0.1-2.0.1
 - Updated to IcedTea 2.0 tag in the IcedTea OpenJDK7 forest
