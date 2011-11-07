@@ -13,23 +13,13 @@
 %global openjdkbuildver b%{openjdkver}
 %global openjdkdate 27_jun_2011
 
-%global snapshot_date 20110803
-%global icedtea_jdk7_snapshot 3defd24c2671
-%global corba_snapshot 616c760dc288
-%global hotspot_snapshot 1dd9b3d73b22
-%global jaxp_snapshot c40983d6ae70
-%global jaxws_snapshot 83db5e316798
-%global jdk_snapshot e46d527097f1
-%global langtools_snapshot fb7fb3071b64
+%global icedtea_version 2.0
+%global hg_tag icedtea-%{icedtea_version}
 
 %global accessmajorver 1.23
 %global accessminorver 0
 %global accessver %{accessmajorver}.%{accessminorver}
 %global accessurl http://ftp.gnome.org/pub/GNOME/sources/java-access-bridge/
-
-%global jaxpurl     http://dlc.sun.com.edgesuite.net/jaxp/1.4.5/jaxp145_01.zip
-%global jafurl      https://java.net/downloads/jax-ws/JDK7/jdk7-jaf-2010_08_19.zip
-%global jaxwsurl    http://dlc.sun.com.edgesuite.net/glassfish/components/jax-ws/openjdk/jdk7/jdk7-jaxws2_2_4-b03-2011_05_27.zip
 
 %global openjdkurlbase http://www.java.net/download/openjdk/jdk7/promoted/
 %global openjdkurl %{openjdkurlbase}%{openjdkbuildver}/
@@ -121,7 +111,7 @@
 %global origin          openjdk
 %global priority        17000
 %global javaver         1.7.0
-%global buildver        0
+%global buildver        1
 
 # Standard JPackage directories and symbolic links.
 # Make 64-bit JDKs just another alternative on 64-bit architectures.
@@ -152,7 +142,8 @@
 # specific dir (note that systemtap will only pickup the tapset
 # for the primary arch for now). Systemtap uses the machine name
 # aka build_cpu as architecture specific directory name.
-%global tapsetdir /usr/share/systemtap/tapset/%{_build_cpu}
+%global tapsetroot /usr/share/systemtap
+%global tapsetdir %{tapsetroot}/tapset/%{_build_cpu}
 %endif
 
 # Prevent brp-java-repack-jars from being run.
@@ -160,7 +151,7 @@
 
 Name:    java-%{javaver}-%{origin}
 Version: %{javaver}.%{buildver}
-Release: 0.1.%{snapshot_date}%{?dist}
+Release: %{icedtea_version}.2%{?dist}
 # java-1.5.0-ibm from jpackage.org set Epoch to 1 for unknown reasons,
 # and this change was brought into RHEL-4.  java-1.5.0-ibm packages
 # also included the epoch in their virtual provides.  This created a
@@ -177,17 +168,17 @@ Group:   Development/Languages
 License:  ASL 1.1 and ASL 2.0 and GPL+ and GPLv2 and GPLv2 with exceptions and LGPL+ and LGPLv2 and MPLv1.0 and MPLv1.1 and Public Domain and W3C
 URL:      http://openjdk.java.net/
 
-# hg clone http://icedtea.classpath.org/hg/icedtea7-forest/ openjdk -r %{icedtea_jdk7_snapshot}
-# hg clone http://icedtea.classpath.org/hg/icedtea7-forest/corba/ openjdk/corba -r %{corba_snapshot}
-# hg clone http://icedtea.classpath.org/hg/icedtea7-forest/hotspot/ openjdk/hotspot -r %{hotspot_snapshot}
-# hg clone http://icedtea.classpath.org/hg/icedtea7-forest/jaxp/ openjdk/jaxp -r %{jaxp_snapshot}
-# hg clone http://icedtea.classpath.org/hg/icedtea7-forest/jaxws/ openjdk/jaxws -r %{jaxws_snapshot}
-# hg clone http://icedtea.classpath.org/hg/icedtea7-forest/jdk/ openjdk/jdk -r %{jdk_snapshot}
-# hg clone http://icedtea.classpath.org/hg/icedtea7-forest/langtools/ openjdk/langtools -r %{langtools_snapshot}
+# hg clone http://icedtea.classpath.org/hg/release/icedtea7-forest-%{icedtea_release}/ openjdk -r %{hg_tag}
+# hg clone http://icedtea.classpath.org/hg/release/icedtea7-forest-%{icedtea_release}/corba/ openjdk/corba -r %{hg_tag}
+# hg clone http://icedtea.classpath.org/hg/release/icedtea7-forest-%{icedtea_release}/hotspot/ openjdk/hotspot -r %{hg_tag}
+# hg clone http://icedtea.classpath.org/hg/release/icedtea7-forest-%{icedtea_release}/jaxp/ openjdk/jaxp -r %{hg_tag}
+# hg clone http://icedtea.classpath.org/hg/release/icedtea7-forest-%{icedtea_release}/jaxws/ openjdk/jaxws -r %{hg_tag}
+# hg clone http://icedtea.classpath.org/hg/release/icedtea7-forest-%{icedtea_release}/jdk/ openjdk/jdk -r %{hg_tag}
+# hg clone http://icedtea.classpath.org/hg/release/icedtea7-forest-%{icedtea_release}/langtools/ openjdk/langtools -r %{hg_tag}
 # find openjdk -name ".hg" -exec rm -rf '{}' \;
 # find openjdk -name ".hgtags" -exec rm -rf '{}' \;
-# tar czf icedtea-jdk7-%{snapshot_date}.tar.gz openjdk
-Source0:  icedtea-jdk7-%{snapshot_date}.tar.gz
+# tar czf openjdk-%{icedtea_version}.tar.gz openjdk
+Source0:  openjdk-icedtea-%{icedtea_version}.tar.gz
 
 # Gnome access bridge
 Source1:  %{accessurl}%{accessmajorver}/java-access-bridge-%{accessver}.tar.bz2
@@ -200,43 +191,34 @@ Source2:  README.src
 Source3:  mauve-%{mauvedate}.tar.gz
 Source4:  mauve_tests
 
-# jaxp drop
-Source5:  %{jaxpurl}
-
-# jaf drop
-Source6:  %{jafurl}
-
-# jaxws drop
-Source7:  %{jaxwsurl}
-
 # javac wrapper (used during bootstrap to strip what ecj doesn't support)
-Source8: javac-wrapper
+Source5: javac-wrapper
 
 # Auto-generated files (used only in bootstrap)
 # To reproduce: 
 # build OpenJDK7 tarball above with any JDK
 # mv generated.build generated
 # tar czf generated-files.tar.gz generated
-Source9: generated-files.tar.gz
+Source6: generated-files.tar.gz
 
 # Class rewrite to rewrite rhino heirarchy
-Source10: class-rewriter.tar.gz
+Source7: class-rewriter.tar.gz
 
 # Systemtap tapsets. Zipped up to keep it small.
-Source11: systemtap-tapset.tar.gz
+Source8: systemtap-tapset.tar.gz
 
 # .desktop files. Zipped up to keep it small.
-Source12: desktop-files.tar.gz
+Source9: desktop-files.tar.gz
 
 # nss configuration file
-Source13: nss.cfg
+Source10: nss.cfg
 
 # FIXME: Taken from IcedTea snapshot 877ad5f00f69, but needs to be moved out
 # hg clone -r 877ad5f00f69 http://icedtea.classpath.org/hg/icedtea7
-Source14: pulseaudio.tar.gz
+Source11: pulseaudio.tar.gz
 
 # Removed libraries that we link instead
-Source15: remove-intree-libraries.sh
+Source12: remove-intree-libraries.sh
 
 # RPM/distribution specific patches
 
@@ -260,44 +242,8 @@ Patch6:   %{name}-debuginfo.patch
 # OpenJDK specific patches
 #
 
-# Use system JPEG and zlib libraries.
-Patch100: libraries.patch
-
-# Add com.sun.image.codec.jpeg support
-Patch101: jpegclasses.patch
-
-# Produces the "expected" behavior for full screen applications or other
-# situations where developers wish to present elements that would cover things
-# like panels
-Patch102: override-redirect-metacity.patch
-
-# GCC 4.3 miscompilation failure fix:
-# http://icedtea.classpath.org/hg/icedtea/rev/f06de06e1ed4
-Patch103: hotspot-gcc-pr36917.patch
-
-# Add support for using an alternate jar tool in JDK building. 
-Patch104: alt-jar.patch
-
-# FIXME: Uses size_t and idx_t types [May be obsolete]
-Patch105: use-idx_t.patch
-
-# Cleans up crypto API to allow unlimited strength usage
-Patch106: clean-crypto.patch
-
-# FIXME: Hardens code, unknown origin [May be obsolete]
-Patch107: jvmtiEnv.patch
-
-# Add rhino jars to bootclasspath
-Patch108: update-bootclasspath.patch
-
-# Updates list of files to be compiled
-Patch109: javafiles.patch
-
 # Add rhino support
-Patch110: rhino.patch
-
-# We build from OpenJDK6 .. this causes some warnings. Make warnings non-fatal
-Patch111: make-warnings-nonfatal.patch
+Patch100: rhino.patch
 
 #
 # Bootstrap patches (code with this is never shipped)
@@ -425,8 +371,7 @@ Patch300: pulse-soundproperties.patch
 # SystemTap support
 # Workaround for RH613824
 Patch301: systemtap-alloc-size-workaround.patch
-Patch302: systemtap-gcc-4.5.patch
-Patch303: systemtap.patch
+Patch302: systemtap.patch
 
 BuildRequires: autoconf
 BuildRequires: automake
@@ -506,25 +451,25 @@ Requires(post):   %{_sbindir}/alternatives
 Requires(postun): %{_sbindir}/alternatives
 
 # Standard JPackage base provides.
-Provides: jre-%{javaver}-%{origin} = %{epoch}:%{version}-%{release}
-Provides: jre-%{origin} = %{epoch}:%{version}-%{release}
-Provides: jre-%{javaver} = %{epoch}:%{version}-%{release}
-Provides: java-%{javaver} = %{epoch}:%{version}-%{release}
-Provides: jre = %{javaver}
-Provides: java-%{origin} = %{epoch}:%{version}-%{release}
-Provides: java = %{epoch}:%{javaver}
+Provides: jre7-%{javaver}-%{origin} = %{epoch}:%{version}-%{release}
+Provides: jre7-%{origin} = %{epoch}:%{version}-%{release}
+Provides: jre7-%{javaver} = %{epoch}:%{version}-%{release}
+Provides: java7-%{javaver} = %{epoch}:%{version}-%{release}
+Provides: jre7 = %{javaver}
+Provides: java7-%{origin} = %{epoch}:%{version}-%{release}
+Provides: java7 = %{epoch}:%{javaver}
 # Standard JPackage extensions provides.
-Provides: jndi = %{epoch}:%{version}
-Provides: jndi-ldap = %{epoch}:%{version}
-Provides: jndi-cos = %{epoch}:%{version}
-Provides: jndi-rmi = %{epoch}:%{version}
-Provides: jndi-dns = %{epoch}:%{version}
-Provides: jaas = %{epoch}:%{version}
-Provides: jsse = %{epoch}:%{version}
-Provides: jce = %{epoch}:%{version}
-Provides: jdbc-stdext = 3.0
-Provides: java-sasl = %{epoch}:%{version}
-Provides: java-fonts = %{epoch}:%{version}
+Provides: jndi7 = %{epoch}:%{version}
+Provides: jndi7-ldap = %{epoch}:%{version}
+Provides: jndi7-cos = %{epoch}:%{version}
+Provides: jndi7-rmi = %{epoch}:%{version}
+Provides: jndi7-dns = %{epoch}:%{version}
+Provides: jaas7 = %{epoch}:%{version}
+Provides: jsse7 = %{epoch}:%{version}
+Provides: jce7 = %{epoch}:%{version}
+Provides: jdbc7-stdext = 3.0
+Provides: java7-sasl = %{epoch}:%{version}
+Provides: java7-fonts = %{epoch}:%{version}
 
 %description
 The OpenJDK runtime environment.
@@ -541,13 +486,13 @@ Requires(post):   %{_sbindir}/alternatives
 Requires(postun): %{_sbindir}/alternatives
 
 # Standard JPackage devel provides.
-Provides: java-sdk-%{javaver}-%{origin} = %{epoch}:%{version}
-Provides: java-sdk-%{javaver} = %{epoch}:%{version}
-Provides: java-sdk-%{origin} = %{epoch}:%{version}
-Provides: java-sdk = %{epoch}:%{javaver}
-Provides: java-%{javaver}-devel = %{epoch}:%{version}
-Provides: java-devel-%{origin} = %{epoch}:%{version}
-Provides: java-devel = %{epoch}:%{javaver}
+Provides: java7-sdk-%{javaver}-%{origin} = %{epoch}:%{version}
+Provides: java7-sdk-%{javaver} = %{epoch}:%{version}
+Provides: java7-sdk-%{origin} = %{epoch}:%{version}
+Provides: java7-sdk = %{epoch}:%{javaver}
+Provides: java7-%{javaver}-devel = %{epoch}:%{version}
+Provides: java7-devel-%{origin} = %{epoch}:%{version}
+Provides: java7-devel = %{epoch}:%{javaver}
 
 
 %description devel
@@ -598,17 +543,6 @@ cp %{SOURCE4} .
 
 # OpenJDK patches
 %patch100
-%patch101
-%patch102
-%patch103
-%patch104
-%patch105
-%patch106
-%patch107
-%patch108
-%patch109
-%patch110
-%patch111
 
 # pulseaudio support
 %if %{with_pulseaudio}
@@ -619,28 +553,24 @@ cp %{SOURCE4} .
 %if %{with_systemtap}
 %patch301
 %patch302
-%patch303
 %endif
 
 # Remove libraries that are linked
-sh %{SOURCE15}
+sh %{SOURCE12}
 
 # Copy jaxp, jaf and jaxws drops
 mkdir drops/
-cp %{SOURCE5} drops/
-cp %{SOURCE6} drops/
-cp %{SOURCE7} drops/
 
 # Extract the generated files
-tar xzf %{SOURCE9}
+tar xzf %{SOURCE6}
 
 # Extract the rewriter (to rewrite rhino classes)
-tar xzf %{SOURCE10}
+tar xzf %{SOURCE7}
 
 # Extract systemtap tapsets
 %if %{with_systemtap}
 
-tar xzf %{SOURCE11}
+tar xzf %{SOURCE8}
 
 for file in tapset/*.in; do
 
@@ -656,11 +586,11 @@ done
 
 # Pulseaudio
 %if %{with_pulseaudio}
-tar xzf %{SOURCE14}
+tar xzf %{SOURCE11}
 %endif
 
 # Extract desktop files
-tar xzf %{SOURCE12}
+tar xzf %{SOURCE9}
 
 # If bootstrapping, apply additional patches
 %if %{gcjbootstrap}
@@ -769,8 +699,8 @@ mkdir -p bootstrap/boot
 cp -aL %{_jvmdir}/java-gcj/* bootstrap/boot/ || : # broken symlinks can be non-fatal but may cause this to fail
 
 # Replace javac with a wrapper that does some magic
-cp -af %{SOURCE8} bootstrap/boot/bin/javac
-chmod u+x bootstrap/boot/bin/javac # SOURCE8 may not be +x
+cp -af %{SOURCE5} bootstrap/boot/bin/javac
+chmod u+x bootstrap/boot/bin/javac # SOURCE5 may not be +x
 sed -i -e s:@RT_JAR@:$PWD/bootstrap/boot/jre/lib/rt.jar:g bootstrap/boot/bin/javac
 
 # Link the native2ascii binary
@@ -857,6 +787,11 @@ make \
   GENSRCDIR="$PWD/generated.build" \
   FT2_CFLAGS="-I/usr/include/freetype2 " \
   FT2_LIBS="-lfreetype " \
+  USE_SYSTEM_JPEG="true" \
+  JPEG_LIBS="-ljpeg" \
+  JPEG_CFLAGS="" \
+  DEBUG_CLASSFILES="true" \
+  DEBUG_BINARIES="true" \
   %{debugbuild}
 
 popd >& /dev/null
@@ -884,6 +819,9 @@ pushd java-access-bridge-%{accessver}
   cp -a bridge/accessibility.properties $JAVA_HOME/jre/lib
   cp -a gnome-java-bridge.jar $JAVA_HOME/jre/lib/ext
 popd
+
+# Copy tz.properties
+echo "sun.zoneinfo.dir=/usr/share/javazi" >> $JAVA_HOME/jre/lib/tz.properties
 
 %if %{runtests}
 # Run jtreg test suite.
@@ -1011,7 +949,7 @@ popd
 
 
 # Install nss.cfg
-install -m 644 %{SOURCE13} $RPM_BUILD_ROOT%{_jvmdir}/%{jredir}/lib/security/
+install -m 644 %{SOURCE10} $RPM_BUILD_ROOT%{_jvmdir}/%{jredir}/lib/security/
 
 
 # Install Javadoc documentation.
@@ -1348,7 +1286,7 @@ exit 0
 %{_mandir}/man1/wsimport-%{name}.1*
 %{_mandir}/man1/xjc-%{name}.1*
 %ifarch %{jit_arches}
-%{tapsetdir}/*.stp
+%{tapsetroot}
 %endif
 
 %files demo -f %{name}-demo.files
@@ -1372,13 +1310,38 @@ exit 0
 %doc %{buildoutputdir}/j2sdk-image/jre/LICENSE
 
 %changelog
+* Sun Nov 06 2011 Deepak Bhole <dbhole@redhat.com> - 1.7.0.1-2.0.2
+- Added missing changelog entry
+
+* Sun Nov 06 2011 Deepak Bhole <dbhole@redhat.com> - 1.7.0.1-2.0.1
+- Updated to IcedTea 2.0 tag in the IcedTea OpenJDK7 forest
+- Removed obsoleted patches
+- Added system timezone support
+- Revamp version/release naming scheme to make it proper
+- Security fixes
+  - S7000600, CVE-2011-3547: InputStream skip() information leak
+  - S7019773, CVE-2011-3548: mutable static AWTKeyStroke.ctor
+  - S7023640, CVE-2011-3551: Java2D TransformHelper integer overflow
+  - S7032417, CVE-2011-3552: excessive default UDP socket limit under SecurityManager
+  - S7046823, CVE-2011-3544: missing SecurityManager checks in scripting engine
+  - S7055902, CVE-2011-3521: IIOP deserialization code execution
+  - S7057857, CVE-2011-3554: insufficient pack200 JAR files uncompress error checks
+  - S7064341, CVE-2011-3389: HTTPS: block-wise chosen-plaintext attack against SSL/TLS (BEAST)
+  - S7070134, CVE-2011-3558: HotSpot crashes with sigsegv from PorterStemmer
+  - S7077466, CVE-2011-3556: RMI DGC server remote code execution
+  - S7083012, CVE-2011-3557: RMI registry privileged code execution
+  - S7096936, CVE-2011-3560: missing checkSetFactory calls in HttpsURLConnection
+
+* Mon Aug 29 2011 Deepak Bhole <dbhole@redhat.com> - 1.7.0.0-0.1.20110823.1
+- Provide a "7" version of items to enfore F-16 policy of no Java 7 builds
+- Resolves: rhbz#728706,  patch from Ville Skyttä <ville.skytta at iki dot fi>
+
 * Fri Aug 05 2011 Deepak Bhole <dbhole@redhat.com> - 1.7.0.0-0.1.20110803
-- Used forest on classpath.org rather than the one on openjdk.net
+- Use a newer snapshot and forest on classpath.org rather than on openjdk.net
 - Added in-tree-removal script to remove libraries that we manually link
 - Updated snapshots
 - Added DISTRO_NAME and FreeType header/lib locations
-- Removed application of patch100 (now in forest)
-- Removed application of patch113 (now in forest)
+- Removed application of patch100 and patch 113 (now in forest)
 
 * Wed Aug 03 2011 Deepak Bhole <dbhole@redhat.com> - 1.7.0.0-0.1.20110729
 - Initial build from java-1.6.0-openjdk RPM

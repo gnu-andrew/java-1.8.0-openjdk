@@ -1,11 +1,8 @@
 ea344cc5b53b73f375558ba41760ff64  class-rewriter.tar.gz
 7df0a19525f26643d4cea3228fbbc6cc  desktop-files.tar.gz
 868ff2d4457d1a2dccfa465fb8220e1c  generated-files.tar.gz
-cdc6809d4b822c5690ace4dffc06150b  icedtea-jdk7-20110803.tar.gz
 c12f124672a97c7491530fed2c0facdc  java-access-bridge-1.23.0.tar.bz2
-32394c780c8fb5e29775f623525993c0  jaxp145_01.zip
-18d15dfd71117daadb332af003d08212  jdk7-jaf-2010_08_19.zip
-2f5b829ade70f67fe272d0b322e3e702  jdk7-jaxws2_2_4-b03-2011_05_27.zip
 a9cdc5f050eb6e97c1b15ddd39978710  mauve-2008-10-22.tar.gz
+7f699508e277b0f523e41ea032e67f86  openjdk-icedtea-2.0.tar.gz
 3d2e0ea03940efdd66e260cba1f48359  pulseaudio.tar.gz
 2f5167cbfadee2f2b3c10c28989b2209  systemtap-tapset.tar.gz
