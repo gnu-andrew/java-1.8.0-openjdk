@@ -384,6 +384,7 @@ BuildRequires: alsa-lib-devel
 BuildRequires: cups-devel
 BuildRequires: desktop-file-utils
 BuildRequires: giflib-devel
+BuildRequires: lcms2-devel
 BuildRequires: libX11-devel
 BuildRequires: libXi-devel
 BuildRequires: libXp-devel
@@ -443,6 +444,7 @@ BuildRequires: systemtap-sdt-devel
 BuildRequires: jakarta-commons-logging
 
 Requires: rhino
+Requires: lcms2
 Requires: libjpeg = 6b
 # Require /etc/pki/java/cacerts.
 Requires: ca-certificates
@@ -1325,6 +1327,7 @@ exit 0
 - Added patch to fix bug in jdk_generic_profile.sh
 - Compile with generic profile to use system libraries
 - Made remove-intree-libraries.sh more robust
+- Added lcms requirement
 
 * Sun Nov 06 2011 Deepak Bhole <dbhole@redhat.com> - 1.7.0.1-2.0.2
 - Added missing changelog entry
