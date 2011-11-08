@@ -151,7 +151,7 @@
 
 Name:    java-%{javaver}-%{origin}
 Version: %{javaver}.%{buildver}
-Release: %{icedtea_version}.2%{?dist}
+Release: %{icedtea_version}.3%{?dist}
 # java-1.5.0-ibm from jpackage.org set Epoch to 1 for unknown reasons,
 # and this change was brought into RHEL-4.  java-1.5.0-ibm packages
 # also included the epoch in their virtual provides.  This created a
@@ -236,7 +236,12 @@ Patch4:   java-1.7.0-openjdk-accessible-toolkit.patch
 
 # Build docs even in debug
 Patch5:   java-1.7.0-openjdk-debugdocs.patch
+
+# Add debuginfo where missing
 Patch6:   %{name}-debuginfo.patch
+
+# Fix bug in jdk_generic_profile.sh
+Patch7:   %{name}-system-zlib.patch
 
 #
 # OpenJDK specific patches
@@ -659,6 +664,8 @@ patch -l -p0 < %{PATCH5}
 patch -l -p0 < %{PATCH6}
 %endif
 
+patch -l -p0 < %{PATCH7}
+
 # Build the re-written rhino jar
 mkdir -p rhino/{old,new}
 
@@ -746,9 +753,13 @@ pushd openjdk-boot
 cp -a ../generated generated.build
 chmod u+rwx generated.build
 
+export ALT_DROPS_DIR=$PWD/../drops
+export ALT_JDK_IMPORT_PATH="$PWD/../bootstrap/jdk1.6.0"
+
+# Set generic profile
+source jdk/make/jdk_generic_profile.sh
+
 make \
-  ALT_DROPS_DIR=$PWD/../drops \
-  ALT_JDK_IMPORT_PATH="$PWD/../bootstrap/jdk1.6.0" \
   ANT="/usr/bin/ant" \
   ALT_BOOTDIR="$PWD/../bootstrap/jdk1.6.0" \
   ICEDTEA_RT="$PWD/../bootstrap/jdk1.6.0/jre/lib/rt.jar" \
@@ -773,9 +784,13 @@ export JDK_TO_BUILD_WITH=/usr/lib/jvm/java-openjdk
 
 pushd openjdk >& /dev/null
 
+export ALT_DROPS_DIR=$PWD/../drops
+export ALT_BOOTDIR="$JDK_TO_BUILD_WITH"
+
+# Set generic profile
+source jdk/make/jdk_generic_profile.sh
+
 make \
-  ALT_DROPS_DIR=$PWD/../drops \
-  ALT_BOOTDIR="$JDK_TO_BUILD_WITH" \
   ANT="/usr/bin/ant" \
   DISTRO_NAME="Fedora" \
   DISTRO_PACKAGE_VERSION="fedora-%{release}-%{_arch}" \
@@ -787,10 +802,6 @@ make \
   GENSRCDIR="$PWD/generated.build" \
   FT2_CFLAGS="-I/usr/include/freetype2 " \
   FT2_LIBS="-lfreetype " \
-  USE_SYSTEM_JPEG="true" \
-  JPEG_LIBS="-ljpeg" \
-  JPEG_CFLAGS="" \
-  DEBUG_CLASSFILES="true" \
   DEBUG_BINARIES="true" \
   %{debugbuild}
 
@@ -1310,6 +1321,11 @@ exit 0
 %doc %{buildoutputdir}/j2sdk-image/jre/LICENSE
 
 %changelog
+* Tue Nov 08 2011 Deepak Bhole <dbhole@redhat.com> - 1.7.0.1-2.0.3
+- Added patch to fix bug in jdk_generic_profile.sh
+- Compile with generic profile to use system libraries
+- Made remove-intree-libraries.sh more robust
+
 * Sun Nov 06 2011 Deepak Bhole <dbhole@redhat.com> - 1.7.0.1-2.0.2
 - Added missing changelog entry
 - Updated Provides

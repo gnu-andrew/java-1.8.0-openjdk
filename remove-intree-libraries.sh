@@ -1,16 +1,26 @@
 #!/bin/sh
 
-ZIP_SRC=jdk/src/share/native/java/util/zip/zlib-*
-JPEG_SRC=jdk/src/share/native/sun/awt/image/jpeg
-GIF_SRC=jdk/src/share/native/sun/awt/giflib
-PNG_SRC=jdk/src/share/native/sun/awt/libpng
-LCMS_SRC=jdk/src/share/native/sun/java2d/cmm/lcms
+ZIP_SRC=openjdk/jdk/src/share/native/java/util/zip/zlib-*
+JPEG_SRC=openjdk/jdk/src/share/native/sun/awt/image/jpeg/jpeg-6b
+GIF_SRC=openjdk/jdk/src/share/native/sun/awt/giflib
+PNG_SRC=openjdk/jdk/src/share/native/sun/awt/libpng
+LCMS_SRC=openjdk/jdk/src/share/native/sun/java2d/cmm/lcms
 
 echo "Removing built-in libs (they will be linked)"
 
 echo "Removing zlib"
+if [ ! -d ${ZIP_SRC} ]; then
+	echo "${ZIP_SRC} does not exist. Refusing to proceed."
+	exit 1
+fi	
 rm -rvf ${ZIP_SRC}
+
 echo "Removing libjpeg"
+if [ ! -f ${JPEG_SRC}/jdhuff.c ]; then # some file that sound definitely exist
+	echo "${JPEG_SRC} does not contain jpeg sources. Refusing to proceed."
+	exit 1
+fi	
+
 rm -vf ${JPEG_SRC}/jcomapi.c
 rm -vf ${JPEG_SRC}/jdapimin.c
 rm -vf ${JPEG_SRC}/jdapistd.c
@@ -56,12 +66,26 @@ rm -vf ${JPEG_SRC}/jfdctflt.c
 rm -vf ${JPEG_SRC}/jfdctfst.c
 rm -vf ${JPEG_SRC}/jfdctint.c
 rm -vf ${JPEG_SRC}/README
+
 echo "Removing giflib"
+if [ ! -d ${GIF_SRC} ]; then
+	echo "${GIF_SRC} does not exist. Refusing to proceed."
+	exit 1
+fi	
 rm -rvf ${GIF_SRC}
+
 echo "Removing libpng"
+if [ ! -d ${PNG_SRC} ]; then
+	echo "${PNG_SRC} does not exist. Refusing to proceed."
+	exit 1
+fi	
 rm -rvf ${PNG_SRC}
 
 echo "Removing lcms"
+if [ ! -d ${LCMS_SRC} ]; then
+	echo "${LCMS_SRC} does not exist. Refusing to proceed."
+	exit 1
+fi
 rm -vf ${LCMS_SRC}/cmscam02.c
 rm -vf ${LCMS_SRC}/cmscgats.c
 rm -vf ${LCMS_SRC}/cmscnvrt.c
