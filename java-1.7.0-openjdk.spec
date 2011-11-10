@@ -243,6 +243,9 @@ Patch6:   %{name}-debuginfo.patch
 # Fix bug in jdk_generic_profile.sh
 Patch7:   %{name}-system-zlib.patch
 
+# Patch to fix glibc name clash
+Patch8:   %{name}-glibc-name-clash.patch
+
 #
 # OpenJDK specific patches
 #
@@ -667,6 +670,10 @@ patch -l -p0 < %{PATCH6}
 %endif
 
 patch -l -p0 < %{PATCH7}
+patch -l -p0 < %{PATCH8}
+
+# Add a "-icedtea" tag to the version
+sed -i "s#BUILD_VARIANT_RELEASE)#BUILD_VARIANT_RELEASE)-icedtea#" openjdk/jdk/make/common/shared/Defs.gmk
 
 # Build the re-written rhino jar
 mkdir -p rhino/{old,new}
@@ -1328,6 +1335,8 @@ exit 0
 - Compile with generic profile to use system libraries
 - Made remove-intree-libraries.sh more robust
 - Added lcms requirement
+- Added patch to fix glibc name clash
+- Updated java version to include -icedtea
 
 * Sun Nov 06 2011 Deepak Bhole <dbhole@redhat.com> - 1.7.0.1-2.0.2
 - Added missing changelog entry
