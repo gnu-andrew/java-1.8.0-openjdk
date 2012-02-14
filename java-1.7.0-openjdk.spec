@@ -13,8 +13,8 @@
 %global openjdkbuildver b%{openjdkver}
 %global openjdkdate 27_jun_2011
 
-%global icedtea_version 2.0
-%global hg_tag icedtea-%{icedtea_version}
+%global icedtea_version 2.1
+%global hg_tag icedtea-{icedtea_version}-branchpoint
 
 %global accessmajorver 1.23
 %global accessminorver 0
@@ -111,7 +111,7 @@
 %global origin          openjdk
 %global priority        17000
 %global javaver         1.7.0
-%global buildver        1
+%global buildver        3
 
 # Standard JPackage directories and symbolic links.
 # Make 64-bit JDKs just another alternative on 64-bit architectures.
@@ -151,7 +151,7 @@
 
 Name:    java-%{javaver}-%{origin}
 Version: %{javaver}.%{buildver}
-Release: %{icedtea_version}.3%{?dist}.1
+Release: %{icedtea_version}%{?dist}
 # java-1.5.0-ibm from jpackage.org set Epoch to 1 for unknown reasons,
 # and this change was brought into RHEL-4.  java-1.5.0-ibm packages
 # also included the epoch in their virtual provides.  This created a
@@ -168,13 +168,13 @@ Group:   Development/Languages
 License:  ASL 1.1 and ASL 2.0 and GPL+ and GPLv2 and GPLv2 with exceptions and LGPL+ and LGPLv2 and MPLv1.0 and MPLv1.1 and Public Domain and W3C
 URL:      http://openjdk.java.net/
 
-# hg clone http://icedtea.classpath.org/hg/release/icedtea7-forest-%{icedtea_release}/ openjdk -r %{hg_tag}
-# hg clone http://icedtea.classpath.org/hg/release/icedtea7-forest-%{icedtea_release}/corba/ openjdk/corba -r %{hg_tag}
-# hg clone http://icedtea.classpath.org/hg/release/icedtea7-forest-%{icedtea_release}/hotspot/ openjdk/hotspot -r %{hg_tag}
-# hg clone http://icedtea.classpath.org/hg/release/icedtea7-forest-%{icedtea_release}/jaxp/ openjdk/jaxp -r %{hg_tag}
-# hg clone http://icedtea.classpath.org/hg/release/icedtea7-forest-%{icedtea_release}/jaxws/ openjdk/jaxws -r %{hg_tag}
-# hg clone http://icedtea.classpath.org/hg/release/icedtea7-forest-%{icedtea_release}/jdk/ openjdk/jdk -r %{hg_tag}
-# hg clone http://icedtea.classpath.org/hg/release/icedtea7-forest-%{icedtea_release}/langtools/ openjdk/langtools -r %{hg_tag}
+# hg clone http://icedtea.classpath.org/hg/release/icedtea7-forest/ openjdk -r %{hg_tag}
+# hg clone http://icedtea.classpath.org/hg/release/icedtea7-forest/corba/ openjdk/corba -r %{hg_tag}
+# hg clone http://icedtea.classpath.org/hg/release/icedtea7-forest/hotspot/ openjdk/hotspot -r %{hg_tag}
+# hg clone http://icedtea.classpath.org/hg/release/icedtea7-forest/jaxp/ openjdk/jaxp -r %{hg_tag}
+# hg clone http://icedtea.classpath.org/hg/release/icedtea7-forest/jaxws/ openjdk/jaxws -r %{hg_tag}
+# hg clone http://icedtea.classpath.org/hg/release/icedtea7-forest/jdk/ openjdk/jdk -r %{hg_tag}
+# hg clone http://icedtea.classpath.org/hg/release/icedtea7-forest/langtools/ openjdk/langtools -r %{hg_tag}
 # find openjdk -name ".hg" -exec rm -rf '{}' \;
 # find openjdk -name ".hgtags" -exec rm -rf '{}' \;
 # tar czf openjdk-%{icedtea_version}.tar.gz openjdk
@@ -1330,6 +1330,20 @@ exit 0
 %doc %{buildoutputdir}/j2sdk-image/jre/LICENSE
 
 %changelog
+* Tue Feb 14 2012 Deepak Bhole <dbhole@redhat.com> - 1.7.0.3-2.1
+- Updated to OpenJDK7u3/IcedTea7 2.1
+- Security fixes:
+  - S7112642, CVE-2012-0497: Incorrect checking for graphics rendering object
+  - S7082299, CVE-2011-3571: AtomicReferenceArray insufficient array type check
+  - S7110687, CVE-2012-0503: Unrestricted use of TimeZone.setDefault
+  - S7110700, CVE-2012-0505: Incomplete info in the deserialization exception
+  - S7110683, CVE-2012-0502: KeyboardFocusManager focus stealing
+  - S7088367, CVE-2011-3563: JavaSound incorrect bounds check
+  - S7126960, CVE-2011-5035: Add property to limit number of request headers to the HTTP Server
+  - S7118283, CVE-2012-0501: Off-by-one bug in ZIP reading code
+  - S7110704, CVE-2012-0506: CORBA fix
+- Add patch to fix compilation with GCC 4.7
+
 * Fri Jan 13 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1:1.7.0.1-2.0.3.1
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_17_Mass_Rebuild
 
