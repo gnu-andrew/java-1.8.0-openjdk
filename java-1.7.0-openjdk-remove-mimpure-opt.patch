@@ -1,0 +1,150 @@
+diff -ur openjdk.orig/jdk/make/common/shared/Compiler-gcc.gmk openjdk/jdk/make/common/shared/Compiler-gcc.gmk
+--- openjdk.orig/jdk/make/common/shared/Compiler-gcc.gmk	2012-02-14 16:12:48.000000000 -0500
++++ openjdk/jdk/make/common/shared/Compiler-gcc.gmk	2012-02-15 17:52:53.747394442 -0500
+@@ -133,7 +133,7 @@
+     REQUIRED_GCC_VER = 4.0.*
+   endif
+   # Option used to create a shared library
+-  SHARED_LIBRARY_FLAG = -shared -mimpure-text
++  SHARED_LIBRARY_FLAG = -shared
+   SUN_COMP_VER := $(shell $(CC) --verbose 2>&1 )
+ 
+ endif
+diff -ur openjdk.orig/jdk/src/share/demo/jvmti/compiledMethodLoad/sample.makefile.txt openjdk/jdk/src/share/demo/jvmti/compiledMethodLoad/sample.makefile.txt
+--- openjdk.orig/jdk/src/share/demo/jvmti/compiledMethodLoad/sample.makefile.txt	2012-02-14 16:12:51.000000000 -0500
++++ openjdk/jdk/src/share/demo/jvmti/compiledMethodLoad/sample.makefile.txt	2012-02-15 17:52:53.750394381 -0500
+@@ -90,7 +90,7 @@
+     OBJECTS=$(SOURCES:%.c=%.o)
+     # Library name and options needed to build it
+     LIBRARY=lib$(LIBNAME).so
+-    LDFLAGS=-Wl,-soname=$(LIBRARY) -static-libgcc -mimpure-text
++    LDFLAGS=-Wl,-soname=$(LIBRARY) -static-libgcc
+     # Libraries we are dependent on
+     LIBRARIES=-lc
+     # Building a shared library
+diff -ur openjdk.orig/jdk/src/share/demo/jvmti/gctest/sample.makefile.txt openjdk/jdk/src/share/demo/jvmti/gctest/sample.makefile.txt
+--- openjdk.orig/jdk/src/share/demo/jvmti/gctest/sample.makefile.txt	2012-02-14 16:12:51.000000000 -0500
++++ openjdk/jdk/src/share/demo/jvmti/gctest/sample.makefile.txt	2012-02-15 17:52:53.750394381 -0500
+@@ -90,7 +90,7 @@
+     OBJECTS=$(SOURCES:%.c=%.o)
+     # Library name and options needed to build it
+     LIBRARY=../lib/lib$(LIBNAME).so
+-    LDFLAGS=-Wl,-soname=$(LIBRARY) -static-libgcc -mimpure-text
++    LDFLAGS=-Wl,-soname=$(LIBRARY) -static-libgcc
+     # Libraries we are dependent on
+     LIBRARIES=-lc
+     # Building a shared library
+diff -ur openjdk.orig/jdk/src/share/demo/jvmti/heapTracker/sample.makefile.txt openjdk/jdk/src/share/demo/jvmti/heapTracker/sample.makefile.txt
+--- openjdk.orig/jdk/src/share/demo/jvmti/heapTracker/sample.makefile.txt	2012-02-14 16:12:51.000000000 -0500
++++ openjdk/jdk/src/share/demo/jvmti/heapTracker/sample.makefile.txt	2012-02-15 17:52:53.749394399 -0500
+@@ -96,7 +96,7 @@
+     OBJECTS=$(SOURCES:%.c=%.o)
+     # Library name and options needed to build it
+     LIBRARY=../lib/lib$(LIBNAME).so
+-    LDFLAGS=-Wl,-soname=$(LIBRARY) -static-libgcc -mimpure-text
++    LDFLAGS=-Wl,-soname=$(LIBRARY) -static-libgcc
+     # Libraries we are dependent on
+     LIBRARIES=-L../../java_crw_demo/src/ -ljava_crw_demo -lc
+     # Building a shared library
+diff -ur openjdk.orig/jdk/src/share/demo/jvmti/heapViewer/sample.makefile.txt openjdk/jdk/src/share/demo/jvmti/heapViewer/sample.makefile.txt
+--- openjdk.orig/jdk/src/share/demo/jvmti/heapViewer/sample.makefile.txt	2012-02-14 16:12:51.000000000 -0500
++++ openjdk/jdk/src/share/demo/jvmti/heapViewer/sample.makefile.txt	2012-02-15 17:52:53.748394420 -0500
+@@ -90,7 +90,7 @@
+     OBJECTS=$(SOURCES:%.c=%.o)
+     # Library name and options needed to build it
+     LIBRARY=../lib/lib$(LIBNAME).so
+-    LDFLAGS=-Wl,-soname=$(LIBRARY) -static-libgcc -mimpure-text
++    LDFLAGS=-Wl,-soname=$(LIBRARY) -static-libgcc
+     # Libraries we are dependent on
+     LIBRARIES=-lc
+     # Building a shared library
+diff -ur openjdk.orig/jdk/src/share/demo/jvmti/hprof/sample.makefile.txt openjdk/jdk/src/share/demo/jvmti/hprof/sample.makefile.txt
+--- openjdk.orig/jdk/src/share/demo/jvmti/hprof/sample.makefile.txt	2012-02-14 16:12:51.000000000 -0500
++++ openjdk/jdk/src/share/demo/jvmti/hprof/sample.makefile.txt	2012-02-15 17:52:53.753394337 -0500
+@@ -130,7 +130,7 @@
+     OBJECTS=$(SOURCES:%.c=%.o)
+     # Library name and options needed to build it
+     LIBRARY=lib$(LIBNAME).so
+-    LDFLAGS=-Wl,-soname=$(LIBRARY) -static-libgcc -mimpure-text
++    LDFLAGS=-Wl,-soname=$(LIBRARY) -static-libgcc
+     # Libraries we are dependent on
+     LIBRARIES= -ldl -lc
+     # Building a shared library
+diff -ur openjdk.orig/jdk/src/share/demo/jvmti/index.html openjdk/jdk/src/share/demo/jvmti/index.html
+--- openjdk.orig/jdk/src/share/demo/jvmti/index.html	2012-02-14 16:12:51.000000000 -0500
++++ openjdk/jdk/src/share/demo/jvmti/index.html	2012-02-15 17:52:53.748394420 -0500
+@@ -308,7 +308,7 @@
+ <code><ul>
+ gcc -O2 -fPIC -pthread -DLINUX -c <i>*.c</i>
+ <br>
+-gcc -z defs -static-libgcc -shared -mimpure-text -o <i>libXXX.so *.o</i> -lc
++gcc -z defs -static-libgcc -shared -o <i>libXXX.so *.o</i> -lc
+ </code></ul>
+ <br>
+ For AMD64:
+@@ -316,7 +316,7 @@
+ <code><ul>
+ gcc -O2 -fPIC -pthread -DLINUX -D_LP64=1 -c <i>*.c</i>
+ <br>
+-gcc -z defs -static-libgcc -shared -mimpure-text -o <i>libXXX.so *.o</i> -lc
++gcc -z defs -static-libgcc -shared -o <i>libXXX.so *.o</i> -lc
+ </code></ul>
+ <br>
+ </li>
+@@ -339,7 +339,7 @@
+ </li>
+ 
+ <li>
+-Library: Use -static-libgcc -mimpure-text.
++Library: Use -static-libgcc.
+ <br>
+ When building the shared library (-shared option), this option
+ allows for maximum portability of the library between different
+diff -ur openjdk.orig/jdk/src/share/demo/jvmti/java_crw_demo/sample.makefile.txt openjdk/jdk/src/share/demo/jvmti/java_crw_demo/sample.makefile.txt
+--- openjdk.orig/jdk/src/share/demo/jvmti/java_crw_demo/sample.makefile.txt	2012-02-14 16:12:51.000000000 -0500
++++ openjdk/jdk/src/share/demo/jvmti/java_crw_demo/sample.makefile.txt	2012-02-15 17:52:53.751394367 -0500
+@@ -90,7 +90,7 @@
+     OBJECTS=$(SOURCES:%.c=%.o)
+     # Library name and options needed to build it
+     LIBRARY=lib$(LIBNAME).so
+-    LDFLAGS=-Wl,-soname=$(LIBRARY) -static-libgcc -mimpure-text
++    LDFLAGS=-Wl,-soname=$(LIBRARY) -static-libgcc
+     # Libraries we are dependent on
+     LIBRARIES=-lc
+     # Building a shared library
+diff -ur openjdk.orig/jdk/src/share/demo/jvmti/minst/sample.makefile.txt openjdk/jdk/src/share/demo/jvmti/minst/sample.makefile.txt
+--- openjdk.orig/jdk/src/share/demo/jvmti/minst/sample.makefile.txt	2012-02-14 16:12:51.000000000 -0500
++++ openjdk/jdk/src/share/demo/jvmti/minst/sample.makefile.txt	2012-02-15 17:52:53.751394367 -0500
+@@ -96,7 +96,7 @@
+     OBJECTS=$(SOURCES:%.c=%.o)
+     # Library name and options needed to build it
+     LIBRARY=../lib/lib$(LIBNAME).so
+-    LDFLAGS=-Wl,-soname=$(LIBRARY) -static-libgcc -mimpure-text
++    LDFLAGS=-Wl,-soname=$(LIBRARY) -static-libgcc
+     # Libraries we are dependent on
+     LIBRARIES=-L../../java_crw_demo/src/ -ljava_crw_demo -lc
+     # Building a shared library
+diff -ur openjdk.orig/jdk/src/share/demo/jvmti/mtrace/sample.makefile.txt openjdk/jdk/src/share/demo/jvmti/mtrace/sample.makefile.txt
+--- openjdk.orig/jdk/src/share/demo/jvmti/mtrace/sample.makefile.txt	2012-02-14 16:12:51.000000000 -0500
++++ openjdk/jdk/src/share/demo/jvmti/mtrace/sample.makefile.txt	2012-02-15 17:52:53.752394352 -0500
+@@ -96,7 +96,7 @@
+     OBJECTS=$(SOURCES:%.c=%.o)
+     # Library name and options needed to build it
+     LIBRARY=../lib/lib$(LIBNAME).so
+-    LDFLAGS=-Wl,-soname=$(LIBRARY) -static-libgcc -mimpure-text
++    LDFLAGS=-Wl,-soname=$(LIBRARY) -static-libgcc
+     # Libraries we are dependent on
+     LIBRARIES=-L../../java_crw_demo/src -ljava_crw_demo -lc
+ 
+diff -ur openjdk.orig/jdk/src/share/demo/jvmti/versionCheck/sample.makefile.txt openjdk/jdk/src/share/demo/jvmti/versionCheck/sample.makefile.txt
+--- openjdk.orig/jdk/src/share/demo/jvmti/versionCheck/sample.makefile.txt	2012-02-14 16:12:51.000000000 -0500
++++ openjdk/jdk/src/share/demo/jvmti/versionCheck/sample.makefile.txt	2012-02-15 17:52:53.749394399 -0500
+@@ -90,7 +90,7 @@
+     OBJECTS=$(SOURCES:%.c=%.o)
+     # Library name and options needed to build it
+     LIBRARY=../lib/lib$(LIBNAME).so
+-    LDFLAGS=-Wl,-soname=$(LIBRARY) -static-libgcc -mimpure-text
++    LDFLAGS=-Wl,-soname=$(LIBRARY) -static-libgcc
+     # Libraries we are dependent on
+     LIBRARIES=-lc
+     # Building a shared library
