@@ -243,9 +243,6 @@ Patch6:   %{name}-debuginfo.patch
 # Fix bug in jdk_generic_profile.sh
 Patch7:   %{name}-system-zlib.patch
 
-# Patch to fix glibc name clash
-Patch8:   %{name}-glibc-name-clash.patch
-
 #
 # OpenJDK specific patches
 #
@@ -670,7 +667,6 @@ patch -l -p0 < %{PATCH6}
 %endif
 
 patch -l -p0 < %{PATCH7}
-patch -l -p0 < %{PATCH8}
 
 # Add a "-icedtea" tag to the version
 sed -i "s#BUILD_VARIANT_RELEASE)#BUILD_VARIANT_RELEASE)-icedtea#" openjdk/jdk/make/common/shared/Defs.gmk
@@ -1332,6 +1328,7 @@ exit 0
 %changelog
 * Tue Feb 14 2012 Deepak Bhole <dbhole@redhat.com> - 1.7.0.3-2.1
 - Updated to OpenJDK7u3/IcedTea7 2.1
+- Removed upstreamed glibc nameclash patch
 - Security fixes:
   - S7112642, CVE-2012-0497: Incorrect checking for graphics rendering object
   - S7082299, CVE-2011-3571: AtomicReferenceArray insufficient array type check
