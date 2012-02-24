@@ -151,7 +151,7 @@
 
 Name:    java-%{javaver}-%{origin}
 Version: %{javaver}.%{buildver}
-Release: %{icedtea_version}%{?dist}
+Release: %{icedtea_version}%{?dist}.1
 # java-1.5.0-ibm from jpackage.org set Epoch to 1 for unknown reasons,
 # and this change was brought into RHEL-4.  java-1.5.0-ibm packages
 # also included the epoch in their virtual provides.  This created a
@@ -811,6 +811,7 @@ make \
   GENSRCDIR="$PWD/generated.build" \
   FT2_CFLAGS="-I/usr/include/freetype2 " \
   FT2_LIBS="-lfreetype " \
+  DEBUG_CLASSFILES="true" \
   DEBUG_BINARIES="true" \
   %{debugbuild}
 
@@ -1330,6 +1331,10 @@ exit 0
 %doc %{buildoutputdir}/j2sdk-image/jre/LICENSE
 
 %changelog
+* Fri Feb 24 2012 Deepak Bhole <dbhole@redhat.com> - 1.7.0.3-2.1.fc17.1
+- Added flag so that debuginfo is built into classfiles (rhbz# 796400) 
+- Updated rhino.patch to build scripting support (rhbz# 796398)
+
 * Tue Feb 14 2012 Deepak Bhole <dbhole@redhat.com> - 1.7.0.3-2.1
 - Updated to OpenJDK7u3/IcedTea7 2.1
 - Removed upstreamed glibc nameclash patch
