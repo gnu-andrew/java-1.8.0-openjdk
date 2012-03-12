@@ -38,10 +38,12 @@
 %ifarch ppc
 %global archbuild ppc
 %global archinstall ppc
+%global archdef PPC
 %endif
 %ifarch ppc64
 %global archbuild ppc64
 %global archinstall ppc64
+%global archdef PPC
 %endif
 %ifarch i386
 %global archbuild i586
@@ -56,8 +58,19 @@
 %global archinstall ia64
 %endif
 %ifarch s390
+%global archbuild s390
+%global archinstall s390
+%global archdef S390
+%endif
+%ifarch s390x
 %global archbuild s390x
 %global archinstall s390x
+%global archdef S390
+%endif
+%ifarch %{arm}
+%global archbuild arm
+%global archinstall arm
+%global archdef ARM
 %endif
 # 32 bit sparc, optimized for v9
 %ifarch sparcv9
@@ -151,7 +164,7 @@
 
 Name:    java-%{javaver}-%{origin}
 Version: %{javaver}.%{buildver}
-Release: %{icedtea_version}%{?dist}.1
+Release: %{icedtea_version}%{?dist}.2
 # java-1.5.0-ibm from jpackage.org set Epoch to 1 for unknown reasons,
 # and this change was brought into RHEL-4.  java-1.5.0-ibm packages
 # also included the epoch in their virtual provides.  This created a
@@ -252,6 +265,14 @@ Patch8:   %{name}-remove-mimpure-opt.patch
 
 # Add rhino support
 Patch100: rhino.patch
+
+# Type fixing for s390
+Patch101: %{name}-bitmap.patch
+Patch102: %{name}-size_t.patch
+
+# Patches for Arm
+Patch103:  %{name}-arm-fixes.patch
+Patch104:  %{name}-arm-ftbfs.patch
 
 #
 # Bootstrap patches (code with this is never shipped)
@@ -430,15 +451,16 @@ BuildRequires: pulseaudio >= 0.9.11
 %endif
 # Zero-assembler build requirement.
 %ifnarch %{jit_arches}
-BuildRequires: libffi-devel
+BuildRequires: libffi-devel >= 3.0.10
 %endif
-
-ExclusiveArch: x86_64 i686
 
 # cacerts build requirement.
 BuildRequires: openssl
 # execstack build requirement.
+# no prelink on ARM yet
+%ifnarch %{arm}
 BuildRequires: prelink
+%endif
 %ifarch %{jit_arches}
 #systemtap build requirement.
 BuildRequires: systemtap-sdt-devel
@@ -654,7 +676,7 @@ export NUM_PROC=`/usr/bin/getconf _NPROCESSORS_ONLN 2> /dev/null || :`
 export NUM_PROC=${NUM_PROC:-1}
 
 # Build IcedTea and OpenJDK.
-%ifarch sparc64 alpha
+%ifarch s390x sparc64 alpha ppc64
 export ARCH_DATA_MODEL=64
 %endif
 %ifarch alpha
@@ -671,6 +693,14 @@ patch -l -p0 < %{PATCH6}
 
 patch -l -p0 < %{PATCH7}
 patch -l -p0 < %{PATCH8}
+
+# Type fixes
+patch -l -p0 < %{PATCH101}
+patch -l -p0 < %{PATCH102}
+
+# Arm fixes
+patch -l -p0 < %{PATCH103}
+patch -l -p0 < %{PATCH104}
 
 # Add a "-icedtea" tag to the version
 sed -i "s#BUILD_VARIANT_RELEASE)#BUILD_VARIANT_RELEASE)-icedtea#" openjdk/jdk/make/common/shared/Defs.gmk
@@ -779,7 +809,20 @@ make \
   DISABLE_NIMBUS="true" \
   XSLT="/usr/bin/xsltproc" \
   FT2_CFLAGS="-I/usr/include/freetype2 " \
-  FT2_LIBS="-lfreetype "
+  FT2_LIBS="-lfreetype " \
+%ifnarch %{jit_arches}
+  LIBFFI_CFLAGS="`pkg-config --cflags libffi` " \
+  LIBFFI_LIBS="-lffi " \
+  ZERO_BUILD="true" \
+  ZERO_LIBARCH="%{archbuild}" \
+  ZERO_ARCHDEF="%{archdef}" \
+%ifarch ppc ppc64 s390 s390x
+  ZERO_ENDIANNESS="big" \
+%else
+  ZERO_ENDIANNESS="little" \
+%endif
+%endif
+  %{nil}
 
 export JDK_TO_BUILD_WITH=$PWD/build/linux-%{archbuild}/j2sdk-image
 
@@ -813,6 +856,18 @@ make \
   FT2_LIBS="-lfreetype " \
   DEBUG_CLASSFILES="true" \
   DEBUG_BINARIES="true" \
+%ifnarch %{jit_arches}
+  LIBFFI_CFLAGS="`pkg-config --cflags libffi` " \
+  LIBFFI_LIBS="-lffi " \
+  ZERO_BUILD="true" \
+  ZERO_LIBARCH="%{archbuild}" \
+  ZERO_ARCHDEF="%{archdef}" \
+%ifarch ppc ppc64 s390 s390x
+  ZERO_ENDIANNESS="big" \
+%else
+  ZERO_ENDIANNESS="little" \
+%endif
+%endif
   %{debugbuild}
 
 popd >& /dev/null
@@ -1331,6 +1386,11 @@ exit 0
 %doc %{buildoutputdir}/j2sdk-image/jre/LICENSE
 
 %changelog
+* Mon Mar 12 2012 Deepak Bhole <dbhole@redhat.com> - 1.7.0.3-2.1.fc17.2
+- Unified spec file for x86, x86_64, ARM and s390
+  - Integrated changes from Dan Horák <dhorak@redhat.com> for Zero/s390
+  - Integrated changes from Chris Phillips <chphilli@redhat.com> for Zero/ARM
+
 * Fri Feb 24 2012 Deepak Bhole <dbhole@redhat.com> - 1.7.0.3-2.1.fc17.1
 - Added flag so that debuginfo is built into classfiles (rhbz# 796400) 
 - Updated rhino.patch to build scripting support (rhbz# 796398)
