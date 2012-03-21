@@ -164,7 +164,7 @@
 
 Name:    java-%{javaver}-%{origin}
 Version: %{javaver}.%{buildver}
-Release: %{icedtea_version}%{?dist}.2
+Release: %{icedtea_version}%{?dist}.3
 # java-1.5.0-ibm from jpackage.org set Epoch to 1 for unknown reasons,
 # and this change was brought into RHEL-4.  java-1.5.0-ibm packages
 # also included the epoch in their virtual provides.  This created a
@@ -258,9 +258,6 @@ Patch7:   %{name}-system-zlib.patch
 
 # Remove option no longer accepted by GCC
 Patch8:   %{name}-remove-mimpure-opt.patch
-
-# Allow specification of jni lib dir
-Patch9:   %{name}-rh740762-setlibdir.patch
 
 #
 # OpenJDK specific patches
@@ -696,7 +693,6 @@ patch -l -p0 < %{PATCH6}
 
 patch -l -p0 < %{PATCH7}
 patch -l -p0 < %{PATCH8}
-patch -l -p0 < %{PATCH9}
 
 # Type fixes
 patch -l -p0 < %{PATCH101}
@@ -860,7 +856,6 @@ make \
   FT2_LIBS="-lfreetype " \
   DEBUG_CLASSFILES="true" \
   DEBUG_BINARIES="true" \
-  JNI_LOC="%{_jvmdir}/%{sdkdir}" \
 %ifnarch %{jit_arches}
   LIBFFI_CFLAGS="`pkg-config --cflags libffi` " \
   LIBFFI_LIBS="-lffi " \
@@ -1391,6 +1386,9 @@ exit 0
 %doc %{buildoutputdir}/j2sdk-image/jre/LICENSE
 
 %changelog
+* Wed Mar 21 2012 Deepak Bhole <dbhole@redhat.com> - 1.7.0.3-2.1.fc17.3
+- Reverted fix for rhbz#740762
+
 * Mon Mar 12 2012 Deepak Bhole <dbhole@redhat.com> - 1.7.0.3-2.1.fc17.2
 - Resolved rhbz#740762: java.library.path is missing some paths
 - Unified spec file for x86, x86_64, ARM and s390
