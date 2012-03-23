@@ -253,12 +253,6 @@ Patch5:   java-1.7.0-openjdk-debugdocs.patch
 # Add debuginfo where missing
 Patch6:   %{name}-debuginfo.patch
 
-# Fix bug in jdk_generic_profile.sh
-Patch7:   %{name}-system-zlib.patch
-
-# Remove option no longer accepted by GCC
-Patch8:   %{name}-remove-mimpure-opt.patch
-
 #
 # OpenJDK specific patches
 #
@@ -271,8 +265,18 @@ Patch101: %{name}-bitmap.patch
 Patch102: %{name}-size_t.patch
 
 # Patches for Arm
-Patch103:  %{name}-arm-fixes.patch
-Patch104:  %{name}-arm-ftbfs.patch
+Patch103: %{name}-arm-fixes.patch
+Patch104: %{name}-arm-ftbfs.patch
+
+# Patch for PPC/PPC64
+Patch105: %{name}-openjdk-ppc-zero-jdk.patch
+Patch106: %{name}-openjdk-ppc-zero-hotspot.patch
+
+# Fix bug in jdk_generic_profile.sh
+Patch107: %{name}-system-zlib.patch
+
+# Remove option no longer accepted by GCC
+Patch108: %{name}-remove-mimpure-opt.patch
 
 #
 # Bootstrap patches (code with this is never shipped)
@@ -691,9 +695,6 @@ patch -l -p0 < %{PATCH5}
 patch -l -p0 < %{PATCH6}
 %endif
 
-patch -l -p0 < %{PATCH7}
-patch -l -p0 < %{PATCH8}
-
 # Type fixes
 patch -l -p0 < %{PATCH101}
 patch -l -p0 < %{PATCH102}
@@ -701,6 +702,16 @@ patch -l -p0 < %{PATCH102}
 # Arm fixes
 patch -l -p0 < %{PATCH103}
 patch -l -p0 < %{PATCH104}
+
+%ifarch ppc ppc64
+# PPC fixes
+patch -l -p0 < %{PATCH105}
+patch -l -p0 < %{PATCH106}
+%endif
+
+# Misc. fixes
+patch -l -p0 < %{PATCH107}
+patch -l -p0 < %{PATCH108}
 
 # Add a "-icedtea" tag to the version
 sed -i "s#BUILD_VARIANT_RELEASE)#BUILD_VARIANT_RELEASE)-icedtea#" openjdk/jdk/make/common/shared/Defs.gmk
@@ -1388,6 +1399,8 @@ exit 0
 %changelog
 * Wed Mar 21 2012 Deepak Bhole <dbhole@redhat.com> - 1.7.0.3-2.1.fc17.3
 - Reverted fix for rhbz#740762
+- Fixed PPC/PPC64 build (rh804136) -- added patches from Chris Phillips
+- Moved OpenJDK specific patches to 1XX series
 
 * Mon Mar 12 2012 Deepak Bhole <dbhole@redhat.com> - 1.7.0.3-2.1.fc17.2
 - Resolved rhbz#740762: java.library.path is missing some paths
