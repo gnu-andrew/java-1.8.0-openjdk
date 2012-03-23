@@ -433,7 +433,7 @@ BuildRequires: redhat-lsb
 %if %{gcjbootstrap}
 BuildRequires: java-1.5.0-gcj-devel
 %else
-BuildRequires: java-1.6.0-openjdk-devel
+BuildRequires: java-devel >= 1:1.6.0
 %endif
 # Mauve build requirements.
 BuildRequires: xorg-x11-server-Xvfb
