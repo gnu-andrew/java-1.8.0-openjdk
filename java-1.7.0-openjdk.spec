@@ -269,8 +269,8 @@ Patch103: %{name}-arm-fixes.patch
 Patch104: %{name}-arm-ftbfs.patch
 
 # Patch for PPC/PPC64
-Patch105: %{name}-openjdk-ppc-zero-jdk.patch
-Patch106: %{name}-openjdk-ppc-zero-hotspot.patch
+Patch105: %{name}-ppc-zero-jdk.patch
+Patch106: %{name}-ppc-zero-hotspot.patch
 
 # Fix bug in jdk_generic_profile.sh
 Patch107: %{name}-system-zlib.patch
