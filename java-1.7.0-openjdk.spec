@@ -164,7 +164,7 @@
 
 Name:    java-%{javaver}-%{origin}
 Version: %{javaver}.%{buildver}
-Release: %{icedtea_version}%{?dist}.4
+Release: %{icedtea_version}%{?dist}.5
 # java-1.5.0-ibm from jpackage.org set Epoch to 1 for unknown reasons,
 # and this change was brought into RHEL-4.  java-1.5.0-ibm packages
 # also included the epoch in their virtual provides.  This created a
@@ -1397,6 +1397,9 @@ exit 0
 %doc %{buildoutputdir}/j2sdk-image/jre/LICENSE
 
 %changelog
+* Mon Mar 26 2012 Deepak Bhole <dbhole@redhat.com> - 1.7.0.3-2.1.fc17.5
+- Added SystemTap fixes by Mark Wielaard
+
 * Sat Mar 24 2012 Dan Horák <dan[at]danny.cz>> - 1.7.0.3-2.1.fc17.4
 - update paths in the ppc patches, add missing snippet
 
