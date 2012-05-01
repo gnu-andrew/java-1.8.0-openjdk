@@ -164,7 +164,7 @@
 
 Name:    java-%{javaver}-%{origin}
 Version: %{javaver}.%{buildver}
-Release: %{icedtea_version}%{?dist}.5
+Release: %{icedtea_version}%{?dist}.6
 # java-1.5.0-ibm from jpackage.org set Epoch to 1 for unknown reasons,
 # and this change was brought into RHEL-4.  java-1.5.0-ibm packages
 # also included the epoch in their virtual provides.  This created a
@@ -469,8 +469,6 @@ BuildRequires: prelink
 #systemtap build requirement.
 BuildRequires: systemtap-sdt-devel
 %endif
-# visualvm build requirements.
-BuildRequires: jakarta-commons-logging
 
 Requires: rhino
 Requires: lcms2
@@ -1397,6 +1395,9 @@ exit 0
 %doc %{buildoutputdir}/j2sdk-image/jre/LICENSE
 
 %changelog
+* Tue May 01 2012 Deepak Bhole <dbhole@redhat.com> - 1.7.0.3-2.1.fc17.6
+- Removed VisualVM requirements
+
 * Mon Mar 26 2012 Deepak Bhole <dbhole@redhat.com> - 1.7.0.3-2.1.fc17.5
 - Added SystemTap fixes by Mark Wielaard
 
