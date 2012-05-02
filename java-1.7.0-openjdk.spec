@@ -505,6 +505,13 @@ Provides: jdbc-stdext = 4.1
 Provides: java-sasl = %{epoch}:%{version}
 Provides: java-fonts = %{epoch}:%{version}
 
+# Obsolete older 1.6 packages as it cannot use the new bytecode
+Obsoletes: java-1.6.0-openjdk
+Obsoletes: java-1.6.0-openjdk-demo
+Obsoletes: java-1.6.0-openjdk-devel
+Obsoletes: java-1.6.0-openjdk-javadoc
+Obsoletes: java-1.6.0-openjdk-src
+
 %description
 The OpenJDK runtime environment.
 
@@ -1397,6 +1404,7 @@ exit 0
 %changelog
 * Tue May 01 2012 Deepak Bhole <dbhole@redhat.com> - 1.7.0.3-2.1.fc17.6
 - Removed VisualVM requirements
+- Obsoleted java-1.6.0-openjdk*
 
 * Mon Mar 26 2012 Deepak Bhole <dbhole@redhat.com> - 1.7.0.3-2.1.fc17.5
 - Added SystemTap fixes by Mark Wielaard
