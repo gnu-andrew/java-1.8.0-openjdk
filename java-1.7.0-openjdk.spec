@@ -430,6 +430,7 @@ BuildRequires: ant-nodeps
 BuildRequires: libXinerama-devel
 BuildRequires: rhino
 BuildRequires: redhat-lsb
+BuildRequires: zip
 %if %{gcjbootstrap}
 BuildRequires: java-1.5.0-gcj-devel
 %else
@@ -1405,6 +1406,7 @@ exit 0
 * Tue May 01 2012 Deepak Bhole <dbhole@redhat.com> - 1.7.0.3-2.1.fc17.6
 - Removed VisualVM requirements
 - Obsoleted java-1.6.0-openjdk*
+- Added BR for zip
 
 * Mon Mar 26 2012 Deepak Bhole <dbhole@redhat.com> - 1.7.0.3-2.1.fc17.5
 - Added SystemTap fixes by Mark Wielaard
