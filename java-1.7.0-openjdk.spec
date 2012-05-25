@@ -9,10 +9,6 @@
 # If runtests is 0 test suites will not be run.
 %global runtests 0
 
-%global openjdkver 147
-%global openjdkbuildver b%{openjdkver}
-%global openjdkdate 27_jun_2011
-
 %global icedtea_version 2.1
 %global hg_tag icedtea-{icedtea_version}-branchpoint
 
@@ -20,10 +16,6 @@
 %global accessminorver 0
 %global accessver %{accessmajorver}.%{accessminorver}
 %global accessurl http://ftp.gnome.org/pub/GNOME/sources/java-access-bridge/
-
-%global openjdkurlbase http://www.java.net/download/openjdk/jdk7/promoted/
-%global openjdkurl %{openjdkurlbase}%{openjdkbuildver}/
-%global openjdkzip  openjdk-7-fcs-src-%{openjdkbuildver}-%{openjdkdate}.zip
 
 %global mauvedate 2008-10-22
 
@@ -45,11 +37,7 @@
 %global archinstall ppc64
 %global archdef PPC
 %endif
-%ifarch i386
-%global archbuild i586
-%global archinstall i386
-%endif
-%ifarch i686
+%ifarch %{ix86}
 %global archbuild i586
 %global archinstall i386
 %endif
@@ -164,7 +152,7 @@
 
 Name:    java-%{javaver}-%{origin}
 Version: %{javaver}.%{buildver}
-Release: %{icedtea_version}%{?dist}.6
+Release: %{icedtea_version}%{?dist}.7
 # java-1.5.0-ibm from jpackage.org set Epoch to 1 for unknown reasons,
 # and this change was brought into RHEL-4.  java-1.5.0-ibm packages
 # also included the epoch in their virtual provides.  This created a
@@ -214,7 +202,7 @@ Source5: javac-wrapper
 # tar czf generated-files.tar.gz generated
 Source6: generated-files.tar.gz
 
-# Class rewrite to rewrite rhino heirarchy
+# Class rewrite to rewrite rhino hierarchy
 Source7: class-rewriter.tar.gz
 
 # Systemtap tapsets. Zipped up to keep it small.
@@ -421,8 +409,7 @@ BuildRequires: libXtst-devel
 BuildRequires: libjpeg-devel
 BuildRequires: libpng-devel
 BuildRequires: wget
-BuildRequires: xalan-j2
-BuildRequires: xerces-j2
+BuildRequires: libxslt
 BuildRequires: xorg-x11-proto-devel
 BuildRequires: mercurial
 BuildRequires: ant
@@ -856,14 +843,20 @@ pushd openjdk >& /dev/null
 export ALT_DROPS_DIR=$PWD/../drops
 export ALT_BOOTDIR="$JDK_TO_BUILD_WITH"
 
+# Save old umask as jdk_generic_profile overwrites it
+oldumask=`umask`
+
 # Set generic profile
 source jdk/make/jdk_generic_profile.sh
+
+# Restore old umask
+umask $oldumask
 
 make \
   ANT="/usr/bin/ant" \
   DISTRO_NAME="Fedora" \
   DISTRO_PACKAGE_VERSION="fedora-%{release}-%{_arch}" \
-  JDK_UPDATE_VERSION="%{openjdkbuildver}" \
+  JDK_UPDATE_VERSION=`printf "%02d" %{buildver}` \
   MILESTONE="fcs" \
   HOTSPOT_BUILD_JOBS="$NUM_PROC" \
   STATIC_CXX="false" \
@@ -873,6 +866,7 @@ make \
   FT2_LIBS="-lfreetype " \
   DEBUG_CLASSFILES="true" \
   DEBUG_BINARIES="true" \
+  ALT_STRIP_POLICY="no_strip" \
 %ifnarch %{jit_arches}
   LIBFFI_CFLAGS="`pkg-config --cflags libffi` " \
   LIBFFI_LIBS="-lffi " \
@@ -1403,6 +1397,10 @@ exit 0
 %doc %{buildoutputdir}/j2sdk-image/jre/LICENSE
 
 %changelog
+* Fri May 25 2012 Deepak Bhole <dbhole@redhat.com> - 1.7.0.3-2.1.fc17.7
+- Miscellaneous fixes brought in from RHEL branch
+- Added ALT_STRIP_POLICY so that debug info is not stripped
+
 * Tue May 01 2012 Deepak Bhole <dbhole@redhat.com> - 1.7.0.3-2.1.fc17.6
 - Removed VisualVM requirements
 - Obsoleted java-1.6.0-openjdk*
