@@ -1399,7 +1399,7 @@ exit 0
 %changelog
 * Fri May 25 2012 Deepak Bhole <dbhole@redhat.com> - 1.7.0.3-2.1.fc17.7
 - Miscellaneous fixes brought in from RHEL branch
-- Added ALT_STRIP_POLICY so that debug info is not stripped
+- Resolves: rhbz#825255: Added ALT_STRIP_POLICY so that debug info is not stripped
 
 * Tue May 01 2012 Deepak Bhole <dbhole@redhat.com> - 1.7.0.3-2.1.fc17.6
 - Removed VisualVM requirements
