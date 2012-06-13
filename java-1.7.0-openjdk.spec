@@ -417,7 +417,7 @@ BuildRequires: zip
 %if %{gcjbootstrap}
 BuildRequires: java-1.5.0-gcj-devel
 %else
-BuildRequires: java-devel >= 1:1.7.0
+BuildRequires: java-1.7.0-openjdk-devel
 %endif
 # Mauve build requirements.
 BuildRequires: xorg-x11-server-Xvfb
@@ -1395,7 +1395,7 @@ exit 0
 %changelog
 * Wed Jun 13 2012 jiri Vanek <jvanek@redhat.com> - 1.7.0.3-2.2.1fc16.8
 - Fixed broken provides sections
-- Changed java-devel requirement >= 1:1.7.0 as there is no 1.6 in F17+
+- Changed java-devel requirement to be self's devel (java-1.7.0-openjdk-devel)
 
 * Mon Jun 11 2012 jiri Vanek <jvanek@redhat.com> - 1.7.0.3-2.2.1fc16.7
 - Used newly prepared tarball with security fixes
