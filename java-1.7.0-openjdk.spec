@@ -9,8 +9,8 @@
 # If runtests is 0 test suites will not be run.
 %global runtests 0
 
-%global icedtea_version 2.1
-%global hg_tag icedtea-{icedtea_version}-branchpoint
+%global icedtea_version 2.2.1
+%global hg_tag icedtea-{icedtea_version}
 
 %global accessmajorver 1.23
 %global accessminorver 0
@@ -169,16 +169,20 @@ Group:   Development/Languages
 License:  ASL 1.1 and ASL 2.0 and GPL+ and GPLv2 and GPLv2 with exceptions and LGPL+ and LGPLv2 and MPLv1.0 and MPLv1.1 and Public Domain and W3C
 URL:      http://openjdk.java.net/
 
-# hg clone http://icedtea.classpath.org/hg/release/icedtea7-forest/ openjdk -r %{hg_tag}
-# hg clone http://icedtea.classpath.org/hg/release/icedtea7-forest/corba/ openjdk/corba -r %{hg_tag}
-# hg clone http://icedtea.classpath.org/hg/release/icedtea7-forest/hotspot/ openjdk/hotspot -r %{hg_tag}
-# hg clone http://icedtea.classpath.org/hg/release/icedtea7-forest/jaxp/ openjdk/jaxp -r %{hg_tag}
-# hg clone http://icedtea.classpath.org/hg/release/icedtea7-forest/jaxws/ openjdk/jaxws -r %{hg_tag}
-# hg clone http://icedtea.classpath.org/hg/release/icedtea7-forest/jdk/ openjdk/jdk -r %{hg_tag}
-# hg clone http://icedtea.classpath.org/hg/release/icedtea7-forest/langtools/ openjdk/langtools -r %{hg_tag}
+#head
+#REPO=http://icedtea.classpath.org/hg/icedtea7-forest
+#current release
+#REPO=http://icedtea.classpath.org/hg/release/icedtea7-forest-2.2
+# hg clone $REPO/ openjdk -r %{hg_tag}
+# hg clone $REPO/corba/ openjdk/corba -r %{hg_tag}
+# hg clone $REPO/hotspot/ openjdk/hotspot -r %{hg_tag}
+# hg clone $REPO/jaxp/ openjdk/jaxp -r %{hg_tag}
+# hg clone $REPO/jaxws/ openjdk/jaxws -r %{hg_tag}
+# hg clone $REPO/jdk/ openjdk/jdk -r %{hg_tag}
+# hg clone $REPO/langtools/ openjdk/langtools -r %{hg_tag}
 # find openjdk -name ".hg" -exec rm -rf '{}' \;
 # find openjdk -name ".hgtags" -exec rm -rf '{}' \;
-# tar czf openjdk-%{icedtea_version}.tar.gz openjdk
+# tar czf openjdk-icedtea-%{icedtea_version}.tar.gz openjdk
 Source0:  openjdk-icedtea-%{icedtea_version}.tar.gz
 
 # Gnome access bridge
@@ -254,17 +258,10 @@ Patch102: %{name}-size_t.patch
 
 # Patches for Arm
 Patch103: %{name}-arm-fixes.patch
-Patch104: %{name}-arm-ftbfs.patch
 
 # Patch for PPC/PPC64
-Patch105: %{name}-ppc-zero-jdk.patch
-Patch106: %{name}-ppc-zero-hotspot.patch
-
-# Fix bug in jdk_generic_profile.sh
-Patch107: %{name}-system-zlib.patch
-
-# Remove option no longer accepted by GCC
-Patch108: %{name}-remove-mimpure-opt.patch
+Patch104: %{name}-ppc-zero-jdk.patch
+Patch105: %{name}-ppc-zero-hotspot.patch
 
 #
 # Bootstrap patches (code with this is never shipped)
@@ -391,7 +388,6 @@ Patch300: pulse-soundproperties.patch
 
 # SystemTap support
 # Workaround for RH613824
-Patch301: systemtap-alloc-size-workaround.patch
 Patch302: systemtap.patch
 
 BuildRequires: autoconf
@@ -473,32 +469,25 @@ Requires(post):   %{_sbindir}/alternatives
 Requires(postun): %{_sbindir}/alternatives
 
 # Standard JPackage base provides.
-Provides: jre-%{javaver}-%{origin} = %{epoch}:%{version}-%{release}
-Provides: jre-%{origin} = %{epoch}:%{version}-%{release}
-Provides: jre-%{javaver} = %{epoch}:%{version}-%{release}
-Provides: java-%{javaver} = %{epoch}:%{version}-%{release}
-Provides: jre = %{javaver}
-Provides: java-%{origin} = %{epoch}:%{version}-%{release}
-Provides: java = %{epoch}:%{javaver}
+Provides: jre7-%{javaver}-%{origin} = %{epoch}:%{version}-%{release}
+Provides: jre7-%{origin} = %{epoch}:%{version}-%{release}
+Provides: jre7-%{javaver} = %{epoch}:%{version}-%{release}
+Provides: java7-%{javaver} = %{epoch}:%{version}-%{release}
+Provides: jre7 = %{javaver}
+Provides: java7-%{origin} = %{epoch}:%{version}-%{release}
+Provides: java7 = %{epoch}:%{javaver}
 # Standard JPackage extensions provides.
-Provides: jndi = %{epoch}:%{version}
-Provides: jndi-ldap = %{epoch}:%{version}
-Provides: jndi-cos = %{epoch}:%{version}
-Provides: jndi-rmi = %{epoch}:%{version}
-Provides: jndi-dns = %{epoch}:%{version}
-Provides: jaas = %{epoch}:%{version}
-Provides: jsse = %{epoch}:%{version}
-Provides: jce = %{epoch}:%{version}
-Provides: jdbc-stdext = 4.1
-Provides: java-sasl = %{epoch}:%{version}
-Provides: java-fonts = %{epoch}:%{version}
-
-# Obsolete older 1.6 packages as it cannot use the new bytecode
-Obsoletes: java-1.6.0-openjdk
-Obsoletes: java-1.6.0-openjdk-demo
-Obsoletes: java-1.6.0-openjdk-devel
-Obsoletes: java-1.6.0-openjdk-javadoc
-Obsoletes: java-1.6.0-openjdk-src
+Provides: jndi7 = %{epoch}:%{version}
+Provides: jndi7-ldap = %{epoch}:%{version}
+Provides: jndi7-cos = %{epoch}:%{version}
+Provides: jndi7-rmi = %{epoch}:%{version}
+Provides: jndi7-dns = %{epoch}:%{version}
+Provides: jaas7 = %{epoch}:%{version}
+Provides: jsse7 = %{epoch}:%{version}
+Provides: jce7 = %{epoch}:%{version}
+Provides: jdbc7-stdext = 4.1
+Provides: java7-sasl = %{epoch}:%{version}
+Provides: java7-fonts = %{epoch}:%{version}
 
 %description
 The OpenJDK runtime environment.
@@ -515,13 +504,13 @@ Requires(post):   %{_sbindir}/alternatives
 Requires(postun): %{_sbindir}/alternatives
 
 # Standard JPackage devel provides.
-Provides: java-sdk-%{javaver}-%{origin} = %{epoch}:%{version}
-Provides: java-sdk-%{javaver} = %{epoch}:%{version}
-Provides: java-sdk-%{origin} = %{epoch}:%{version}
-Provides: java-sdk = %{epoch}:%{javaver}
-Provides: java-%{javaver}-devel = %{epoch}:%{version}
-Provides: java-devel-%{origin} = %{epoch}:%{version}
-Provides: java-devel = %{epoch}:%{javaver}
+Provides: java7-sdk-%{javaver}-%{origin} = %{epoch}:%{version}
+Provides: java7-sdk-%{javaver} = %{epoch}:%{version}
+Provides: java7-sdk-%{origin} = %{epoch}:%{version}
+Provides: java7-sdk = %{epoch}:%{javaver}
+Provides: java7-%{javaver}-devel = %{epoch}:%{version}
+Provides: java7-devel-%{origin} = %{epoch}:%{version}
+Provides: java7-devel = %{epoch}:%{javaver}
 
 
 %description devel
@@ -557,8 +546,8 @@ Requires(post):   %{_sbindir}/alternatives
 Requires(postun): %{_sbindir}/alternatives
 
 # Standard JPackage javadoc provides.
-Provides: java-javadoc = %{epoch}:%{version}-%{release}
-Provides: java-%{javaver}-javadoc = %{epoch}:%{version}-%{release}
+Provides: java7-javadoc = %{epoch}:%{version}-%{release}
+Provides: java7-%{javaver}-javadoc = %{epoch}:%{version}-%{release}
 
 %description javadoc
 The OpenJDK API documentation.
@@ -580,7 +569,6 @@ cp %{SOURCE4} .
 
 # Add systemtap patches if enabled
 %if %{with_systemtap}
-%patch301
 %patch302
 %endif
 
@@ -688,23 +676,22 @@ patch -l -p0 < %{PATCH5}
 patch -l -p0 < %{PATCH6}
 %endif
 
-# Type fixes
+# Type fixes for s390
+%ifarch s390 s390x
 patch -l -p0 < %{PATCH101}
-patch -l -p0 < %{PATCH102}
+#patch -l -p0 < %{PATCH102} # size_t patch disabled for now as it has conflicts
+%endif
 
 # Arm fixes
+%ifarch %{arm}
 patch -l -p0 < %{PATCH103}
-patch -l -p0 < %{PATCH104}
+%endif
 
 %ifarch ppc ppc64
 # PPC fixes
+patch -l -p0 < %{PATCH104}
 patch -l -p0 < %{PATCH105}
-patch -l -p0 < %{PATCH106}
 %endif
-
-# Misc. fixes
-patch -l -p0 < %{PATCH107}
-patch -l -p0 < %{PATCH108}
 
 # Add a "-icedtea" tag to the version
 sed -i "s#BUILD_VARIANT_RELEASE)#BUILD_VARIANT_RELEASE)-icedtea#" openjdk/jdk/make/common/shared/Defs.gmk
@@ -904,6 +891,7 @@ pushd java-access-bridge-%{accessver}
   make
   export PATH=$OLD_PATH
   cp -a bridge/accessibility.properties $JAVA_HOME/jre/lib
+  chmod 644 gnome-java-bridge.jar
   cp -a gnome-java-bridge.jar $JAVA_HOME/jre/lib/ext
 popd
 
@@ -1354,6 +1342,7 @@ exit 0
 %{_mandir}/man1/javah-%{name}.1*
 %{_mandir}/man1/javap-%{name}.1*
 %{_mandir}/man1/jconsole-%{name}.1*
+%{_mandir}/man1/jcmd-%{name}.1*
 %{_mandir}/man1/jdb-%{name}.1*
 %{_mandir}/man1/jhat-%{name}.1*
 %{_mandir}/man1/jinfo-%{name}.1*
@@ -1397,40 +1386,46 @@ exit 0
 %doc %{buildoutputdir}/j2sdk-image/jre/LICENSE
 
 %changelog
-* Fri May 25 2012 Deepak Bhole <dbhole@redhat.com> - 1.7.0.3-2.1.fc17.7
+* Mon Jun 11 2012 jiri Vanek <jvanek@redhat.com> - 1.7.0.3-2.2.1fc16.7
+- Used newly prepared tarball with security fixes
+- Bump to icedtea7-forest-2.2.1
+- _mandir/man1/jcmd-name.1 added to alternatives
+- Updated rhino.patch
+- Modified partially upstreamed patch302 - systemtap.patch
+- Temporarly disabled patch102 - java-1.7.0-openjdk-size_t.patch
+- Removed already upstreamed patches 104,107,108,301
+  - java-1.7.0-openjdk-arm-ftbfs.patch
+  - java-1.7.0-openjdk-system-zlib.patch
+  - java-1.7.0-openjdk-remove-mimpure-opt.patch
+  - systemtap-alloc-size-workaround.patch
+- patch 105 (java-1.7.0-openjdk-ppc-zero-jdk.patch) have become 104
+- patch 106 (java-1.7.0-openjdk-ppc-zero-hotspot.patch) have become 105
+- Added build requires zip, which was untill now  dependence  of dependence
+- Access gnome brridge jar forced to be 644
+
+* Fri May 25 2012 Deepak Bhole <dbhole@redhat.com> - 1.7.0.3-2.1.fc16.6
 - Miscellaneous fixes brought in from RHEL branch
 - Resolves: rhbz#825255: Added ALT_STRIP_POLICY so that debug info is not stripped
+- Moved Patch #7 (usage of system zlib) to #107
 
-* Tue May 01 2012 Deepak Bhole <dbhole@redhat.com> - 1.7.0.3-2.1.fc17.6
+* Tue May 01 2012 Deepak Bhole <dbhole@redhat.com> - 1.7.0.3-2.1.fc16.5
 - Removed VisualVM requirements
-- Obsoleted java-1.6.0-openjdk*
-- Added BR for zip
 
-* Mon Mar 26 2012 Deepak Bhole <dbhole@redhat.com> - 1.7.0.3-2.1.fc17.5
-- Added SystemTap fixes by Mark Wielaard
+* Mon Mar 26 2012 Deepak Bhole <dbhole@redhat.com> - 1.7.0.3-2.1.fc16.4
+- Merged with F17 branch
 
-* Sat Mar 24 2012 Dan Horák <dan[at]danny.cz>> - 1.7.0.3-2.1.fc17.4
-- update paths in the ppc patches, add missing snippet
+* Wed Mar 21 2012 Deepak Bhole <dbhole@redhat.com> - 1.7.0.3-2.1.fc16.3
+- Reverted fix for rh740762
 
-* Wed Mar 21 2012 Deepak Bhole <dbhole@redhat.com> - 1.7.0.3-2.1.fc17.3
-- Reverted fix for rhbz#740762
-- Fixed PPC/PPC64 build (rh804136) -- added patches from Chris Phillips
-- Moved OpenJDK specific patches to 1XX series
+* Mon Mar 12 2012 Deepak Bhole <dbhole@redhat.com> - 1.7.0.3-2.1.fc16.2
+- Resolved rh740762: java.library.path is missing some paths
 
-* Mon Mar 12 2012 Deepak Bhole <dbhole@redhat.com> - 1.7.0.3-2.1.fc17.2
-- Resolved rhbz#740762: java.library.path is missing some paths
-- Unified spec file for x86, x86_64, ARM and s390
-  - Integrated changes from Dan Horák <dhorak@redhat.com> for Zero/s390
-  - Integrated changes from Chris Phillips <chphilli@redhat.com> for Zero/ARM
-
-* Fri Feb 24 2012 Deepak Bhole <dbhole@redhat.com> - 1.7.0.3-2.1.fc17.1
-- Added flag so that debuginfo is built into classfiles (rhbz# 796400)
+* Fri Feb 24 2012 Deepak Bhole <dbhole@redhat.com> - 1.7.0.3-2.1.fc16.1
+- Added flag so that debuginfo is built into classfiles (rhbz# 796400) 
 - Updated rhino.patch to build scripting support (rhbz# 796398)
 
 * Tue Feb 14 2012 Deepak Bhole <dbhole@redhat.com> - 1.7.0.3-2.1
 - Updated to OpenJDK7u3/IcedTea7 2.1
-- Removed upstreamed glibc nameclash patch
-- Added patch to remove the -mimpure option to gcc
 - Security fixes:
   - S7112642, CVE-2012-0497: Incorrect checking for graphics rendering object
   - S7082299, CVE-2011-3571: AtomicReferenceArray insufficient array type check
@@ -1443,10 +1438,7 @@ exit 0
   - S7110704, CVE-2012-0506: CORBA fix
 - Add patch to fix compilation with GCC 4.7
 
-* Fri Jan 13 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1:1.7.0.1-2.0.3.1
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_17_Mass_Rebuild
-
-* Tue Nov 08 2011 Deepak Bhole <dbhole@redhat.com> - 1.7.0.1-2.0.3
+* Tue Nov 15 2011 Deepak Bhole <dbhole@redhat.com> - 1.7.0.1-2.0.3
 - Added patch to fix bug in jdk_generic_profile.sh
 - Compile with generic profile to use system libraries
 - Made remove-intree-libraries.sh more robust
@@ -1456,7 +1448,6 @@ exit 0
 
 * Sun Nov 06 2011 Deepak Bhole <dbhole@redhat.com> - 1.7.0.1-2.0.2
 - Added missing changelog entry
-- Updated Provides
 
 * Sun Nov 06 2011 Deepak Bhole <dbhole@redhat.com> - 1.7.0.1-2.0.1
 - Updated to IcedTea 2.0 tag in the IcedTea OpenJDK7 forest
