@@ -1,11 +1,20 @@
---- jsorig	2008-12-05 11:43:39.000000000 -0500
-+++ openjdk/jdk/src/share/lib/security/java.security	2008-12-05 11:43:45.000000000 -0500
-@@ -127,7 +127,7 @@
+--- openjdk/jdk/src/share/lib/security/java.security-src
++++ openjdk/jdk/src/share/lib/security/java.security
+@@ -131,7 +131,7 @@
  # passed to checkPackageAccess unless the
  # corresponding RuntimePermission ("accessClassInPackage."+package) has
  # been granted.
--package.access=sun.,com.sun.xml.internal.ws.,com.sun.xml.internal.bind.,com.sun.imageio.
-+package.access=sun.,com.sun.xml.internal.ws.,com.sun.xml.internal.bind.,com.sun.imageio.,org.GNOME.Accessibility.,org.GNOME.Bonobo.
+-package.access=sun.,com.sun.xml.internal.ws.,com.sun.xml.internal.bind.,com.sun.imageio.,com.sun.org.apache.xerces.internal.utils.,com.sun.org.apache.xalan.internal.utils.
++package.access=sun.,com.sun.xml.internal.ws.,com.sun.xml.internal.bind.,com.sun.imageio.,com.sun.org.apache.xerces.internal.utils.,com.sun.org.apache.xalan.internal.utils.,org.GNOME.Accessibility.,org.GNOME.Bonobo.
  
  #
  # List of comma-separated packages that start with or equal this string
+@@ -143,7 +143,7 @@
+ # by default, none of the class loaders supplied with the JDK call
+ # checkPackageDefinition.
+ #
+-package.definition=sun.,com.sun.xml.internal.ws.,com.sun.xml.internal.bind.,com.sun.imageio.,com.sun.org.apache.xerces.internal.utils.,com.sun.org.apache.xalan.internal.utils.
++package.definition=sun.,com.sun.xml.internal.ws.,com.sun.xml.internal.bind.,com.sun.imageio.,com.sun.org.apache.xerces.internal.utils.,com.sun.org.apache.xalan.internal.utils.,org.GNOME.Accessibility.,org.GNOME.Bonobo.
+ 
+ #
+ # Determines whether this properties file can be appended to
