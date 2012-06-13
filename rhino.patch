@@ -44,9 +44,9 @@ diff -ur openjdk.orig/jdk/make/common/Release.gmk openjdk/jdk/make/common/Releas
  	$(CP) $(RESOURCES_JAR) $(JRE_IMAGE_DIR)/lib/resources.jar
  	$(CP) $(JSSE_JAR) $(JRE_IMAGE_DIR)/lib/jsse.jar
 +	$(CP) $(RHINO_JAR) $(JRE_IMAGE_DIR)/lib/rhino.jar
- 	@# Generate meta-index to make boot and extension class loaders lazier
- 	$(CD) $(JRE_IMAGE_DIR)/lib && \
- 	    $(BOOT_JAVA_CMD) -jar $(BUILDMETAINDEX_JARFILE) \
+ ifneq ($(JFR_JAR),)
+ 	$(CP) $(JFR_JAR) $(JRE_IMAGE_DIR)/lib/jfr.jar
+ endif
 diff -ur openjdk.orig/jdk/src/share/classes/com/sun/script/javascript/ExternalScriptable.java openjdk/jdk/src/share/classes/com/sun/script/javascript/ExternalScriptable.java
 --- openjdk.orig/jdk/src/share/classes/com/sun/script/javascript/ExternalScriptable.java	2012-02-14 16:12:49.000000000 -0500
 +++ openjdk/jdk/src/share/classes/com/sun/script/javascript/ExternalScriptable.java	2012-02-22 14:10:53.325225237 -0500
