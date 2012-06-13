@@ -152,7 +152,7 @@
 
 Name:    java-%{javaver}-%{origin}
 Version: %{javaver}.%{buildver}
-Release: %{icedtea_version}%{?dist}.7
+Release: %{icedtea_version}%{?dist}.8
 # java-1.5.0-ibm from jpackage.org set Epoch to 1 for unknown reasons,
 # and this change was brought into RHEL-4.  java-1.5.0-ibm packages
 # also included the epoch in their virtual provides.  This created a
@@ -469,25 +469,32 @@ Requires(post):   %{_sbindir}/alternatives
 Requires(postun): %{_sbindir}/alternatives
 
 # Standard JPackage base provides.
-Provides: jre7-%{javaver}-%{origin} = %{epoch}:%{version}-%{release}
-Provides: jre7-%{origin} = %{epoch}:%{version}-%{release}
-Provides: jre7-%{javaver} = %{epoch}:%{version}-%{release}
-Provides: java7-%{javaver} = %{epoch}:%{version}-%{release}
-Provides: jre7 = %{javaver}
-Provides: java7-%{origin} = %{epoch}:%{version}-%{release}
-Provides: java7 = %{epoch}:%{javaver}
+Provides: jre-%{javaver}-%{origin} = %{epoch}:%{version}-%{release}
+Provides: jre-%{origin} = %{epoch}:%{version}-%{release}
+Provides: jre-%{javaver} = %{epoch}:%{version}-%{release}
+Provides: java-%{javaver} = %{epoch}:%{version}-%{release}
+Provides: jre = %{javaver}
+Provides: java-%{origin} = %{epoch}:%{version}-%{release}
+Provides: java = %{epoch}:%{javaver}
 # Standard JPackage extensions provides.
-Provides: jndi7 = %{epoch}:%{version}
-Provides: jndi7-ldap = %{epoch}:%{version}
-Provides: jndi7-cos = %{epoch}:%{version}
-Provides: jndi7-rmi = %{epoch}:%{version}
-Provides: jndi7-dns = %{epoch}:%{version}
-Provides: jaas7 = %{epoch}:%{version}
-Provides: jsse7 = %{epoch}:%{version}
-Provides: jce7 = %{epoch}:%{version}
-Provides: jdbc7-stdext = 4.1
-Provides: java7-sasl = %{epoch}:%{version}
-Provides: java7-fonts = %{epoch}:%{version}
+Provides: jndi = %{epoch}:%{version}
+Provides: jndi-ldap = %{epoch}:%{version}
+Provides: jndi-cos = %{epoch}:%{version}
+Provides: jndi-rmi = %{epoch}:%{version}
+Provides: jndi-dns = %{epoch}:%{version}
+Provides: jaas = %{epoch}:%{version}
+Provides: jsse = %{epoch}:%{version}
+Provides: jce = %{epoch}:%{version}
+Provides: jdbc-stdext = 4.1
+Provides: java-sasl = %{epoch}:%{version}
+Provides: java-fonts = %{epoch}:%{version}
+
+# Obsolete older 1.6 packages as it cannot use the new bytecode
+Obsoletes: java-1.6.0-openjdk
+Obsoletes: java-1.6.0-openjdk-demo
+Obsoletes: java-1.6.0-openjdk-devel
+Obsoletes: java-1.6.0-openjdk-javadoc
+Obsoletes: java-1.6.0-openjdk-src
 
 %description
 The OpenJDK runtime environment.
@@ -504,13 +511,13 @@ Requires(post):   %{_sbindir}/alternatives
 Requires(postun): %{_sbindir}/alternatives
 
 # Standard JPackage devel provides.
-Provides: java7-sdk-%{javaver}-%{origin} = %{epoch}:%{version}
-Provides: java7-sdk-%{javaver} = %{epoch}:%{version}
-Provides: java7-sdk-%{origin} = %{epoch}:%{version}
-Provides: java7-sdk = %{epoch}:%{javaver}
-Provides: java7-%{javaver}-devel = %{epoch}:%{version}
-Provides: java7-devel-%{origin} = %{epoch}:%{version}
-Provides: java7-devel = %{epoch}:%{javaver}
+Provides: java-sdk-%{javaver}-%{origin} = %{epoch}:%{version}
+Provides: java-sdk-%{javaver} = %{epoch}:%{version}
+Provides: java-sdk-%{origin} = %{epoch}:%{version}
+Provides: java-sdk = %{epoch}:%{javaver}
+Provides: java-%{javaver}-devel = %{epoch}:%{version}
+Provides: java-devel-%{origin} = %{epoch}:%{version}
+Provides: java-devel = %{epoch}:%{javaver}
 
 
 %description devel
@@ -546,8 +553,8 @@ Requires(post):   %{_sbindir}/alternatives
 Requires(postun): %{_sbindir}/alternatives
 
 # Standard JPackage javadoc provides.
-Provides: java7-javadoc = %{epoch}:%{version}-%{release}
-Provides: java7-%{javaver}-javadoc = %{epoch}:%{version}-%{release}
+Provides: java-javadoc = %{epoch}:%{version}-%{release}
+Provides: java-%{javaver}-javadoc = %{epoch}:%{version}-%{release}
 
 %description javadoc
 The OpenJDK API documentation.
@@ -1386,6 +1393,9 @@ exit 0
 %doc %{buildoutputdir}/j2sdk-image/jre/LICENSE
 
 %changelog
+* Wed Jun 13 2012 jiri Vanek <jvanek@redhat.com> - 1.7.0.3-2.2.1fc16.8
+- Fixed broken provides sections
+
 * Mon Jun 11 2012 jiri Vanek <jvanek@redhat.com> - 1.7.0.3-2.2.1fc16.7
 - Used newly prepared tarball with security fixes
 - Bump to icedtea7-forest-2.2.1
