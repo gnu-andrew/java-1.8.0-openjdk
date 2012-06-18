@@ -1393,11 +1393,11 @@ exit 0
 %doc %{buildoutputdir}/j2sdk-image/jre/LICENSE
 
 %changelog
-* Wed Jun 13 2012 jiri Vanek <jvanek@redhat.com> - 1.7.0.3-2.2.1fc16.8
+* Wed Jun 13 2012 jiri Vanek <jvanek@redhat.com> - 1.7.0.3-2.2.1fc18.8
 - Fixed broken provides sections
 - Changed java-devel requirement to be self's devel (java-1.7.0-openjdk-devel)
 
-* Mon Jun 11 2012 jiri Vanek <jvanek@redhat.com> - 1.7.0.3-2.2.1fc16.7
+* Mon Jun 11 2012 jiri Vanek <jvanek@redhat.com> - 1.7.0.3-2.2.1fc18.7
 - Used newly prepared tarball with security fixes
 - Bump to icedtea7-forest-2.2.1
 - _mandir/man1/jcmd-name.1 added to alternatives
@@ -1414,25 +1414,35 @@ exit 0
 - Added build requires zip, which was untill now  dependence  of dependence
 - Access gnome brridge jar forced to be 644
 
-* Fri May 25 2012 Deepak Bhole <dbhole@redhat.com> - 1.7.0.3-2.1.fc16.6
+* Fri May 25 2012 Deepak Bhole <dbhole@redhat.com> - 1.7.0.3-2.1.fc17.7
 - Miscellaneous fixes brought in from RHEL branch
 - Resolves: rhbz#825255: Added ALT_STRIP_POLICY so that debug info is not stripped
 - Moved Patch #7 (usage of system zlib) to #107
 
-* Tue May 01 2012 Deepak Bhole <dbhole@redhat.com> - 1.7.0.3-2.1.fc16.5
+* Tue May 01 2012 Deepak Bhole <dbhole@redhat.com> - 1.7.0.3-2.1.fc17.6
 - Removed VisualVM requirements
+- Obsoleted java-1.6.0-openjdk*
+- Added BR for zip
 
-* Mon Mar 26 2012 Deepak Bhole <dbhole@redhat.com> - 1.7.0.3-2.1.fc16.4
-- Merged with F17 branch
+* Mon Mar 26 2012 Deepak Bhole <dbhole@redhat.com> - 1.7.0.3-2.1.fc17.5
+- Added SystemTap fixes by Mark Wielaard
 
-* Wed Mar 21 2012 Deepak Bhole <dbhole@redhat.com> - 1.7.0.3-2.1.fc16.3
-- Reverted fix for rh740762
+* Sat Mar 24 2012 Dan HorÃ¡k <dan[at]danny.cz>> - 1.7.0.3-2.1.fc17.4
+- update paths in the ppc patches, add missing snippet
 
-* Mon Mar 12 2012 Deepak Bhole <dbhole@redhat.com> - 1.7.0.3-2.1.fc16.2
-- Resolved rh740762: java.library.path is missing some paths
+* Wed Mar 21 2012 Deepak Bhole <dbhole@redhat.com> - 1.7.0.3-2.1.fc17.3
+- Reverted fix for rhbz#740762
+- Fixed PPC/PPC64 build (rh804136) -- added patches from Chris Phillips
+- Moved OpenJDK specific patches to 1XX series
 
-* Fri Feb 24 2012 Deepak Bhole <dbhole@redhat.com> - 1.7.0.3-2.1.fc16.1
-- Added flag so that debuginfo is built into classfiles (rhbz# 796400) 
+* Mon Mar 12 2012 Deepak Bhole <dbhole@redhat.com> - 1.7.0.3-2.1.fc17.2
+- Resolved rhbz#740762: java.library.path is missing some paths
+- Unified spec file for x86, x86_64, ARM and s390
+  - Integrated changes from Dan HorÃ¡k <dhorak@redhat.com> for Zero/s390
+  - Integrated changes from Chris Phillips <chphilli@redhat.com> for Zero/ARM
+
+* Fri Feb 24 2012 Deepak Bhole <dbhole@redhat.com> - 1.7.0.3-2.1.fc17.1
+- Added flag so that debuginfo is built into classfiles (rhbz# 796400)
 - Updated rhino.patch to build scripting support (rhbz# 796398)
 
 * Tue Feb 14 2012 Deepak Bhole <dbhole@redhat.com> - 1.7.0.3-2.1
