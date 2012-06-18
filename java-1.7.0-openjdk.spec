@@ -110,9 +110,10 @@
 
 # Standard JPackage naming and versioning defines.
 %global origin          openjdk
-%global priority        17000
+%global buildver        5
+# Keep priority on 5digits in case buildver>9
+%global priority        1700%{buildver}
 %global javaver         1.7.0
-%global buildver        3
 
 # Standard JPackage directories and symbolic links.
 # Make 64-bit JDKs just another alternative on 64-bit architectures.
