@@ -153,7 +153,7 @@
 
 Name:    java-%{javaver}-%{origin}
 Version: %{javaver}.%{buildver}
-Release: %{icedtea_version}%{?dist}.8
+Release: %{icedtea_version}%{?dist}.9
 # java-1.5.0-ibm from jpackage.org set Epoch to 1 for unknown reasons,
 # and this change was brought into RHEL-4.  java-1.5.0-ibm packages
 # also included the epoch in their virtual provides.  This created a
@@ -225,6 +225,13 @@ Source11: pulseaudio.tar.gz
 
 # Removed libraries that we link instead
 Source12: remove-intree-libraries.sh
+
+# For primary arches, build latest and for secondary, use hs22
+# base (icedtea-2.2.1 tag)
+
+# http://icedtea.classpath.org/hg/release/icedtea7-forest-2.1
+# hg tag: icedtea-2.1.1
+Source100:  openjdk-icedtea-2.1.1.tar.gz
 
 # RPM/distribution specific patches
 
@@ -390,6 +397,13 @@ Patch300: pulse-soundproperties.patch
 # SystemTap support
 # Workaround for RH613824
 Patch302: systemtap.patch
+
+#
+# IcedTea 2.1.1/hs22 specific patches
+#
+
+# Rhino support
+Patch400: rhino-icedtea-2.1.1.patch
 
 BuildRequires: autoconf
 BuildRequires: automake
@@ -561,14 +575,27 @@ Provides: java-%{javaver}-javadoc = %{epoch}:%{version}-%{release}
 The OpenJDK API documentation.
 
 %prep
-%setup -q -c -n %{name}
+
+%ifarch %{jit_arches}
+%global source_num 0
+%else
+%global source_num 100
+%endif
+
+%setup -q -c -n %{name} -T -a %{source_num}
 %setup -q -n %{name} -T -D -a 3
 %setup -q -n %{name} -T -D -a 1
 cp %{SOURCE2} .
 cp %{SOURCE4} .
 
 # OpenJDK patches
+
+# Rhino patch -- one default version (100) and one specific to 2.1.1 (400)
+%ifarch %{jit_arches}
 %patch100
+%else
+%patch400
+%endif
 
 # pulseaudio support
 %if %{with_pulseaudio}
@@ -687,7 +714,7 @@ patch -l -p0 < %{PATCH6}
 # Type fixes for s390
 %ifarch s390 s390x
 patch -l -p0 < %{PATCH101}
-#patch -l -p0 < %{PATCH102} # size_t patch disabled for now as it has conflicts
+patch -l -p0 < %{PATCH102}
 %endif
 
 # Arm fixes
@@ -851,7 +878,11 @@ make \
   ANT="/usr/bin/ant" \
   DISTRO_NAME="Fedora" \
   DISTRO_PACKAGE_VERSION="fedora-%{release}-%{_arch}" \
+%ifarch %{jit_arches}
   JDK_UPDATE_VERSION=`printf "%02d" %{buildver}` \
+%else
+  JDK_UPDATE_VERSION="03" \
+%endif
   MILESTONE="fcs" \
   HOTSPOT_BUILD_JOBS="$NUM_PROC" \
   STATIC_CXX="false" \
@@ -1350,7 +1381,9 @@ exit 0
 %{_mandir}/man1/javah-%{name}.1*
 %{_mandir}/man1/javap-%{name}.1*
 %{_mandir}/man1/jconsole-%{name}.1*
+%ifarch %{jit_arches} # Only in u4+
 %{_mandir}/man1/jcmd-%{name}.1*
+%endif
 %{_mandir}/man1/jdb-%{name}.1*
 %{_mandir}/man1/jhat-%{name}.1*
 %{_mandir}/man1/jinfo-%{name}.1*
@@ -1394,6 +1427,10 @@ exit 0
 %doc %{buildoutputdir}/j2sdk-image/jre/LICENSE
 
 %changelog
+* Mon Jul 09 2012 Deepak Bhole <dbhole@redhat.com> - 1.7.0.5-2.2.1.fc18.9
+- Added support to build older (2.1.1/u3/hs22) version on non-jit (secondary)
+  arches
+
 * Wed Jun 13 2012 jiri Vanek <jvanek@redhat.com> - 1.7.0.3-2.2.1fc18.8
 - Fixed broken provides sections
 - Changed java-devel requirement to be self's devel (java-1.7.0-openjdk-devel)
