@@ -9,7 +9,7 @@
 # If runtests is 0 test suites will not be run.
 %global runtests 0
 
-%global icedtea_version 2.2.1
+%global icedtea_version 2.3
 %global hg_tag icedtea-{icedtea_version}
 
 %global accessmajorver 1.23
@@ -110,7 +110,7 @@
 
 # Standard JPackage naming and versioning defines.
 %global origin          openjdk
-%global buildver        5
+%global buildver        6
 # Keep priority on 5digits in case buildver>9
 %global priority        1700%{buildver}
 %global javaver         1.7.0
@@ -153,7 +153,7 @@
 
 Name:    java-%{javaver}-%{origin}
 Version: %{javaver}.%{buildver}
-Release: %{icedtea_version}%{?dist}.10
+Release: %{icedtea_version}%{?dist}.1
 # java-1.5.0-ibm from jpackage.org set Epoch to 1 for unknown reasons,
 # and this change was brought into RHEL-4.  java-1.5.0-ibm packages
 # also included the epoch in their virtual provides.  This created a
@@ -174,6 +174,7 @@ URL:      http://openjdk.java.net/
 #REPO=http://icedtea.classpath.org/hg/icedtea7-forest
 #current release
 #REPO=http://icedtea.classpath.org/hg/release/icedtea7-forest-2.2
+#REPO=http://icedtea.classpath.org/hg/release/icedtea7-forest-2.3
 # hg clone $REPO/ openjdk -r %{hg_tag}
 # hg clone $REPO/corba/ openjdk/corba -r %{hg_tag}
 # hg clone $REPO/hotspot/ openjdk/hotspot -r %{hg_tag}
@@ -270,6 +271,8 @@ Patch103: %{name}-arm-fixes.patch
 # Patch for PPC/PPC64
 Patch104: %{name}-ppc-zero-jdk.patch
 Patch105: %{name}-ppc-zero-hotspot.patch
+
+Patch106: %{name}-freetype-check-fix.patch
 
 #
 # Bootstrap patches (code with this is never shipped)
@@ -404,6 +407,8 @@ Patch302: systemtap.patch
 
 # Rhino support
 Patch400: rhino-icedtea-2.1.1.patch
+
+Patch500: java-1.7.0-openjdk-removing_jvisualvm_man.patch
 
 BuildRequires: autoconf
 BuildRequires: automake
@@ -690,6 +695,8 @@ cp -a openjdk openjdk-boot
 
 %endif
 
+%patch500
+
 %build
 # How many cpu's do we have?
 export NUM_PROC=`/usr/bin/getconf _NPROCESSORS_ONLN 2> /dev/null || :`
@@ -721,6 +728,8 @@ patch -l -p0 < %{PATCH102}
 %ifarch %{arm}
 patch -l -p0 < %{PATCH103}
 %endif
+
+patch -l -p0 < %{PATCH106}
 
 %ifarch ppc ppc64
 # PPC fixes
@@ -892,7 +901,7 @@ make \
   FT2_LIBS="-lfreetype " \
   DEBUG_CLASSFILES="true" \
   DEBUG_BINARIES="true" \
-  ALT_STRIP_POLICY="no_strip" \
+  STRIP_POLICY="no_strip" \
 %ifnarch %{jit_arches}
   LIBFFI_CFLAGS="`pkg-config --cflags libffi` " \
   LIBFFI_LIBS="-lffi " \
@@ -1427,6 +1436,15 @@ exit 0
 %doc %{buildoutputdir}/j2sdk-image/jre/LICENSE
 
 %changelog
+* Mon Aug 27 2012 Jiri Vanek <jvanek@redhat.com> - 1.7.0.6-2.3.fc19.1
+- Updated to latest IcedTea7-forest-2.3
+- Current build is u6
+- ALT_STRIP_POLICY replaced by STRIP_POLICY
+- Patch103 java-1.7.0-opendk-arm-fixes.patch split to itself and new 
+  Patch106 java-1.7.0-opendk-freetype-check-fix.patch by meaning. Both applied.
+- Added Patch500, java-1.7.0-openjdk-removing_jvisualvm_man.patch to remove 
+  jvisualvm manpages from processing
+
 * Thu Jul 19 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1:1.7.0.5-2.2.1.10
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_18_Mass_Rebuild
 
