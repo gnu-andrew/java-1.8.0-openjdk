@@ -983,6 +983,12 @@ echo "sun.zoneinfo.dir=/usr/share/javazi" >> $JAVA_HOME/jre/lib/tz.properties
 rm -rf $RPM_BUILD_ROOT
 STRIP_KEEP_SYMTAB=libjvm*
 
+# Install symlink to default soundfont
+install -d -m 755 $RPM_BUILD_ROOT%{_jvmdir}/%{jredir}/lib/audio
+pushd $RPM_BUILD_ROOT%{_jvmdir}/%{jredir}/lib/audio
+ln -s %{_datadir}/soundfonts/default.sf2
+popd
+
 pushd %{buildoutputdir}/j2sdk-image
 
   # Install main files.
@@ -1357,6 +1363,8 @@ exit 0
 %{_mandir}/man1/tnameserv-%{name}.1*
 %{_mandir}/man1/unpack200-%{name}.1*
 %{_jvmdir}/%{jredir}/lib/security/nss.cfg
+%{_jvmdir}/%{jredir}/lib/audio/
+
 
 %files devel
 %defattr(-,root,root,-)
@@ -1436,6 +1444,9 @@ exit 0
 %doc %{buildoutputdir}/j2sdk-image/jre/LICENSE
 
 %changelog
+* Tue Aug 28 2012 Orcan Ogetbil <oget.fedora@gmail.com> - 1.7.0.6-2.3.fc19.1
+- Add symlink to Fedora's default soundfont rhbz#541466
+
 * Mon Aug 27 2012 Jiri Vanek <jvanek@redhat.com> - 1.7.0.6-2.3.fc19.1
 - Updated to latest IcedTea7-forest-2.3
 - Current build is u6
