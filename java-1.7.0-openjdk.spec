@@ -408,7 +408,7 @@ Patch302: systemtap.patch
 # Rhino support
 Patch400: rhino-icedtea-2.1.1.patch
 
-Patch500: java-1.7.0-openjdk-removing_jvisualvm_man.patch
+#Patch500: java-1.7.0-openjdk-removing_jvisualvm_man.patch
 
 BuildRequires: autoconf
 BuildRequires: automake
@@ -695,7 +695,7 @@ cp -a openjdk openjdk-boot
 
 %endif
 
-%patch500
+#%patch500
 
 %build
 # How many cpu's do we have?
@@ -1448,6 +1448,9 @@ exit 0
 - Updated to IcedTea-Forest 2.3.1
 - Resolves rhbz#RH852051, CVE-2012-4681: Reintroduce PackageAccessible checks 
   removed in 6788531.
+- Commented out Patch500, java-1.7.0-openjdk-removing_jvisualvm_man.patch as
+  as already included in this Iced-Tea.
+- Will be nice to verify after next upstream sync if it is still upstreamed
 
 * Tue Aug 28 2012 Orcan Ogetbil <oget.fedora@gmail.com> - 1.7.0.6-2.3.fc19.1
 - Add symlink to Fedora's default soundfont rhbz#541466
