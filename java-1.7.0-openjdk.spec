@@ -9,7 +9,7 @@
 # If runtests is 0 test suites will not be run.
 %global runtests 0
 
-%global icedtea_version 2.3
+%global icedtea_version 2.3.1
 %global hg_tag icedtea-{icedtea_version}
 
 %global accessmajorver 1.23
@@ -1444,6 +1444,11 @@ exit 0
 %doc %{buildoutputdir}/j2sdk-image/jre/LICENSE
 
 %changelog
+* Thu Aug 30 2012 jiri Vanek <jvanek@redhat.com> - 1.7.0.6-2.3.1.fc19.1
+- Updated to IcedTea-Forest 2.3.1
+- Resolves rhbz#RH852051, CVE-2012-4681: Reintroduce PackageAccessible checks 
+  removed in 6788531.
+
 * Tue Aug 28 2012 Orcan Ogetbil <oget.fedora@gmail.com> - 1.7.0.6-2.3.fc19.1
 - Add symlink to Fedora's default soundfont rhbz#541466
 
