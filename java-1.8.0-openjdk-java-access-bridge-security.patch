@@ -1,5 +1,5 @@
---- openjdk/jdk/src/share/lib/security/java.security-src
-+++ openjdk/jdk/src/share/lib/security/java.security
+--- jdk8/jdk/src/share/lib/security/java.security-src
++++ jdk8/jdk/src/share/lib/security/java.security
 @@ -131,7 +131,7 @@
  # passed to checkPackageAccess unless the
  # corresponding RuntimePermission ("accessClassInPackage."+package) has

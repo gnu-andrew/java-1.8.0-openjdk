@@ -1,16 +1,11 @@
-# If gcjbootstrap is 1 OpenJDK is bootstrapped against
-# java-1.5.0-gcj-devel.  If gcjbootstrap is 0 OpenJDK is built against
-# java-1.6.0-openjdk-devel.
-%global gcjbootstrap 0
-
 # If debug is 1, OpenJDK is built with all debug info present.
 %global debug 0
 
 # If runtests is 0 test suites will not be run.
 %global runtests 0
 
-%global icedtea_version 2.3.1
-%global hg_tag icedtea-{icedtea_version}
+%global jdk8_version b53
+%global hg_tag jdk8-%{jdk8_version}
 
 %global accessmajorver 1.23
 %global accessminorver 0
@@ -81,7 +76,7 @@
 %global debugbuild %{nil}
 %endif
 
-%global buildoutputdir openjdk/build/linux-%{archbuild}
+%global buildoutputdir jdk8.build
 
 %global with_pulseaudio 1
 
@@ -110,10 +105,10 @@
 
 # Standard JPackage naming and versioning defines.
 %global origin          openjdk
-%global buildver        6
+%global buildver        0
 # Keep priority on 5digits in case buildver>9
 %global priority        1700%{buildver}
-%global javaver         1.7.0
+%global javaver         1.8.0
 
 # Standard JPackage directories and symbolic links.
 # Make 64-bit JDKs just another alternative on 64-bit architectures.
@@ -153,7 +148,7 @@
 
 Name:    java-%{javaver}-%{origin}
 Version: %{javaver}.%{buildver}
-Release: %{icedtea_version}%{?dist}.1
+Release: %{jdk8_version}%{?dist}.1
 # java-1.5.0-ibm from jpackage.org set Epoch to 1 for unknown reasons,
 # and this change was brought into RHEL-4.  java-1.5.0-ibm packages
 # also included the epoch in their virtual provides.  This created a
@@ -170,22 +165,7 @@ Group:   Development/Languages
 License:  ASL 1.1 and ASL 2.0 and GPL+ and GPLv2 and GPLv2 with exceptions and LGPL+ and LGPLv2 and MPLv1.0 and MPLv1.1 and Public Domain and W3C
 URL:      http://openjdk.java.net/
 
-#head
-#REPO=http://icedtea.classpath.org/hg/icedtea7-forest
-#current release
-#REPO=http://icedtea.classpath.org/hg/release/icedtea7-forest-2.2
-#REPO=http://icedtea.classpath.org/hg/release/icedtea7-forest-2.3
-# hg clone $REPO/ openjdk -r %{hg_tag}
-# hg clone $REPO/corba/ openjdk/corba -r %{hg_tag}
-# hg clone $REPO/hotspot/ openjdk/hotspot -r %{hg_tag}
-# hg clone $REPO/jaxp/ openjdk/jaxp -r %{hg_tag}
-# hg clone $REPO/jaxws/ openjdk/jaxws -r %{hg_tag}
-# hg clone $REPO/jdk/ openjdk/jdk -r %{hg_tag}
-# hg clone $REPO/langtools/ openjdk/langtools -r %{hg_tag}
-# find openjdk -name ".hg" -exec rm -rf '{}' \;
-# find openjdk -name ".hgtags" -exec rm -rf '{}' \;
-# tar czf openjdk-icedtea-%{icedtea_version}.tar.gz openjdk
-Source0:  openjdk-icedtea-%{icedtea_version}.tar.gz
+Source0:  jdk8-%{jdk8_version}.tar.gz
 
 # Gnome access bridge
 Source1:  %{accessurl}%{accessmajorver}/java-access-bridge-%{accessver}.tar.bz2
@@ -197,16 +177,6 @@ Source2:  README.src
 # FIXME: Is this applicable for 7?
 Source3:  mauve-%{mauvedate}.tar.gz
 Source4:  mauve_tests
-
-# javac wrapper (used during bootstrap to strip what ecj doesn't support)
-Source5: javac-wrapper
-
-# Auto-generated files (used only in bootstrap)
-# To reproduce: 
-# build OpenJDK7 tarball above with any JDK
-# mv generated.build generated
-# tar czf generated-files.tar.gz generated
-Source6: generated-files.tar.gz
 
 # Class rewrite to rewrite rhino hierarchy
 Source7: class-rewriter.tar.gz
@@ -225,7 +195,7 @@ Source10: nss.cfg
 Source11: pulseaudio.tar.gz
 
 # Removed libraries that we link instead
-Source12: remove-intree-libraries.sh
+#Source12: remove-intree-libraries.sh
 
 # For primary arches, build latest and for secondary, use hs22
 # base (icedtea-2.2.1 tag)
@@ -237,22 +207,22 @@ Source100:  openjdk-icedtea-2.1.1.tar.gz
 # RPM/distribution specific patches
 
 # Allow TCK to pass with access bridge wired in
-Patch1:   java-1.7.0-openjdk-java-access-bridge-tck.patch
+Patch1:   java-1.8.0-openjdk-java-access-bridge-tck.patch
 
 # Adjust idlj compilation switches to match what system idlj supports
-Patch2:   java-1.7.0-openjdk-java-access-bridge-idlj.patch
+Patch2:   java-1.8.0-openjdk-java-access-bridge-idlj.patch
 
 # Disable access to access-bridge packages by untrusted apps
-Patch3:   java-1.7.0-openjdk-java-access-bridge-security.patch
+Patch3:   java-1.8.0-openjdk-java-access-bridge-security.patch
 
 # Ignore AWTError when assistive technologies are loaded 
-Patch4:   java-1.7.0-openjdk-accessible-toolkit.patch
+Patch4:   java-1.8.0-openjdk-accessible-toolkit.patch
 
 # Build docs even in debug
-Patch5:   java-1.7.0-openjdk-debugdocs.patch
+#Patch5:   java-1.8.0-openjdk-debugdocs.patch
 
 # Add debuginfo where missing
-Patch6:   %{name}-debuginfo.patch
+#Patch6:   %{name}-debuginfo.patch
 
 #
 # OpenJDK specific patches
@@ -271,123 +241,9 @@ Patch103: %{name}-arm-fixes.patch
 # Patch for PPC/PPC64
 Patch104: %{name}-ppc-zero-jdk.patch
 Patch105: %{name}-ppc-zero-hotspot.patch
+Patch106: %{name}-ppc-zero-corba.patch
 
-Patch106: %{name}-freetype-check-fix.patch
-
-#
-# Bootstrap patches (code with this is never shipped)
-#
-
-# Explicitly set javac, so that the bootstrap version is used
-Patch200: bootstrap-ant-javac.patch
-
-# Adjusted generated sources path to use prebuilt ones
-Patch201: bootstrap-corba-defs.patch
-
-# Do not use idlj to generate sources, as we use prebuilt ones
-Patch202: bootstrap-corba-idlj.patch
-
-# Disable decending into sources dir for generation
-Patch203: bootstrap-corba-no-gen.patch
-
-# Explicitly compile ORB.java
-Patch204: bootstrap-corba-orb.patch
-
-# Don't build demos in bootstrap
-Patch205: bootstrap-demos.patch
-
-# Change hex constants to be numbers instead of 0x... so that ecj can compile them right
-Patch206: bootstrap-ecj-fphexconstants.patch
-
-# Adjust opt flags to remove what ecj doesn't support
-Patch207: bootstrap-ecj-opts.patch
-
-# use pre-generated font config files
-Patch208: bootstrap-fontconfig.patch
-
-# Don't write auto-generation message in bootstrap
-Patch209: bootstrap-generated-comments.patch
-
-# Adjust bootclasspath to match what ecj has
-Patch210: bootstrap-xbootclasspath.patch
-
-# Wire in icedtea rt.jar (FIXME: name needs update, kept same for now to match icedtea name)
-Patch211: bootstrap-icedteart.patch
-
-# Wire in custom compiles rt classes
-Patch212: bootstrap-jar.patch
-
-# Compile inner opengl class explicitly
-Patch213: bootstrap-javah.patch
-
-# Disable ct.sym creation for bootstrap
-Patch214: bootstrap-symbols.patch
-
-# Disable icon generation for bootstrap
-Patch215: bootstrap-tobin.patch
-
-# Don't run test_gamma
-Patch216: bootstrap-test_gamma.patch
-
-# Disable requirement of module_lib path which bootstrap java_home doesn't have
-Patch217: bootstrap-tools.jar.patch
-
-# Allow -J opts to jar only if jar knows of them
-Patch218: bootstrap-jopt.patch
-
-# Explicitly add jaxp classes to classpath
-Patch219: bootstrap-jaxp-dependency.patch
-
-# Don't fork when generating stubs
-Patch220: bootstrap-genstubs-nofork.patch
-
-# Remove dependency on ProcessBuilder which is package private to Oracle implementation
-Patch221: bootstrap-break-processbuilder-dependency.patch
-
-# Allow to build with 1.5
-Patch222: bootstrap-revert-6973616.patch
-
-# Avoid trying to load system zone info provider and failing
-Patch223: bootstrap-revert-6941137.patch
-
-# Replace usage of string switch with if/elseif/else
-Patch224: bootstrap-ecj-stringswitch.patch
-
-# Allow langtools to use older jdk
-Patch225: bootstrap-langtools-force-old-jdk.patch
-
-# Access JDK sources and classes from langtools build
-Patch226: bootstrap-corba-dependencies.patch
-
-# Access langtools classes for Javadoc
-Patch227: bootstrap-jaxws-langtools-dependency.patch
-
-# Access JDK sources for com.sun.net.httpserver
-Patch228: bootstrap-jaxws-jdk-dependency.patch
-
-# Access JDK and generated sources to build servicability agent
-Patch229: bootstrap-hotspot-jdk-dependency.patch
-
-# Remove use of multi-catch and replace with regular multi-level catch
-Patch230: bootstrap-ecj-multicatch.patch
-
-# Remove use of try-with-resources and replace with manual close
-Patch231: bootstrap-ecj-trywithresources.patch
-
-# Disable auto-boxing and manally cast
-Patch232: bootstrap-ecj-autoboxing.patch
-
-# Use custom xslt processor
-Patch233: bootstrap-xsltproc.patch
-
-# Use constants from interface rather than impl
-Patch234: bootstrap-pr40188.patch
-
-# Remove use of diamond operator and replace with manual
-Patch235: bootstrap-ecj-diamond.patch
-
-# Adjust javah switches to only use what bootstrap version supports
-Patch236: bootstrap-javah-xbootclasspath.patch
+Patch107: %{name}-freetype-check-fix.patch
 
 #
 # Optional component packages
@@ -401,51 +257,38 @@ Patch300: pulse-soundproperties.patch
 # Workaround for RH613824
 Patch302: systemtap.patch
 
-#
-# IcedTea 2.1.1/hs22 specific patches
-#
-
-# Rhino support
-Patch400: rhino-icedtea-2.1.1.patch
-
-#Patch500: java-1.7.0-openjdk-removing_jvisualvm_man.patch
-
 BuildRequires: autoconf
 BuildRequires: automake
 BuildRequires: alsa-lib-devel
 BuildRequires: cups-devel
 BuildRequires: desktop-file-utils
-BuildRequires: giflib-devel
-BuildRequires: lcms2-devel
+#BuildRequires: giflib-devel
+#BuildRequires: lcms2-devel
 BuildRequires: libX11-devel
 BuildRequires: libXi-devel
 BuildRequires: libXp-devel
 BuildRequires: libXt-devel
 BuildRequires: libXtst-devel
-BuildRequires: libjpeg-devel
-BuildRequires: libpng-devel
+#BuildRequires: libjpeg-devel
+#BuildRequires: libpng-devel
 BuildRequires: wget
 BuildRequires: libxslt
 BuildRequires: xorg-x11-proto-devel
-BuildRequires: mercurial
+#Huh?
+#BuildRequires: mercurial
 BuildRequires: ant
 BuildRequires: ant-nodeps
 BuildRequires: libXinerama-devel
 BuildRequires: rhino
-BuildRequires: redhat-lsb
+#BuildRequires: redhat-lsb
 BuildRequires: zip
-%if %{gcjbootstrap}
-BuildRequires: java-1.5.0-gcj-devel
-%else
 BuildRequires: java-1.7.0-openjdk-devel
-%endif
 # Mauve build requirements.
 BuildRequires: xorg-x11-server-Xvfb
 BuildRequires: xorg-x11-fonts-Type1
 BuildRequires: xorg-x11-fonts-misc
 BuildRequires: freetype-devel >= 2.3.0
 BuildRequires: fontconfig
-BuildRequires: ecj
 # Java Access Bridge for GNOME build requirements.
 BuildRequires: at-spi-devel
 BuildRequires: gawk
@@ -489,13 +332,13 @@ Requires(post):   %{_sbindir}/alternatives
 Requires(postun): %{_sbindir}/alternatives
 
 # Standard JPackage base provides.
-Provides: jre-%{javaver}-%{origin} = %{epoch}:%{version}-%{release}
-Provides: jre-%{origin} = %{epoch}:%{version}-%{release}
-Provides: jre-%{javaver} = %{epoch}:%{version}-%{release}
-Provides: java-%{javaver} = %{epoch}:%{version}-%{release}
-Provides: jre = %{javaver}
-Provides: java-%{origin} = %{epoch}:%{version}-%{release}
-Provides: java = %{epoch}:%{javaver}
+Provides: jre8-%{javaver}-%{origin} = %{epoch}:%{version}-%{release}
+Provides: jre8-%{origin} = %{epoch}:%{version}-%{release}
+Provides: jre8-%{javaver} = %{epoch}:%{version}-%{release}
+Provides: java8-%{javaver} = %{epoch}:%{version}-%{release}
+Provides: jre8 = %{javaver}
+Provides: java8-%{origin} = %{epoch}:%{version}-%{release}
+Provides: java8 = %{epoch}:%{javaver}
 # Standard JPackage extensions provides.
 Provides: jndi = %{epoch}:%{version}
 Provides: jndi-ldap = %{epoch}:%{version}
@@ -581,13 +424,7 @@ The OpenJDK API documentation.
 
 %prep
 
-%ifarch %{jit_arches}
-%global source_num 0
-%else
-%global source_num 100
-%endif
-
-%setup -q -c -n %{name} -T -a %{source_num}
+%setup -q -c -n %{name} -T -a 0
 %setup -q -n %{name} -T -D -a 3
 %setup -q -n %{name} -T -D -a 1
 cp %{SOURCE2} .
@@ -595,12 +432,8 @@ cp %{SOURCE4} .
 
 # OpenJDK patches
 
-# Rhino patch -- one default version (100) and one specific to 2.1.1 (400)
-%ifarch %{jit_arches}
+# Rhino patch
 %patch100
-%else
-%patch400
-%endif
 
 # pulseaudio support
 %if %{with_pulseaudio}
@@ -613,13 +446,11 @@ cp %{SOURCE4} .
 %endif
 
 # Remove libraries that are linked
-sh %{SOURCE12}
+# disabled until 8 has all system library fixes upstream
+#sh %{SOURCE12}
 
 # Copy jaxp, jaf and jaxws drops
 mkdir drops/
-
-# Extract the generated files
-tar xzf %{SOURCE6}
 
 # Extract the rewriter (to rewrite rhino classes)
 tar xzf %{SOURCE7}
@@ -648,54 +479,6 @@ tar xzf %{SOURCE11}
 
 # Extract desktop files
 tar xzf %{SOURCE9}
-
-# If bootstrapping, apply additional patches
-%if %{gcjbootstrap}
-
-cp -a openjdk openjdk-boot
-
-# Add bootstrap patches
-%patch200
-%patch201
-%patch202
-%patch203
-%patch204
-%patch205
-%patch206
-%patch207
-%patch208
-%patch209
-%patch210
-%patch211
-%patch212
-%patch213
-%patch214
-%patch215
-%patch216
-%patch217
-%patch218
-%patch219
-%patch220
-%patch221
-%patch222
-%patch223
-%patch224
-%patch225
-%patch226
-%patch227
-%patch228
-%patch229
-%patch230
-%patch231
-%patch232
-%patch233
-%patch234
-%patch235
-%patch236
-
-%endif
-
-#%patch500
 
 %build
 # How many cpu's do we have?
@@ -729,16 +512,14 @@ patch -l -p0 < %{PATCH102}
 patch -l -p0 < %{PATCH103}
 %endif
 
-patch -l -p0 < %{PATCH106}
+patch -l -p0 < %{PATCH107}
 
 %ifarch ppc ppc64
 # PPC fixes
 patch -l -p0 < %{PATCH104}
 patch -l -p0 < %{PATCH105}
+patch -l -p0 < %{PATCH106}
 %endif
-
-# Add a "-icedtea" tag to the version
-sed -i "s#BUILD_VARIANT_RELEASE)#BUILD_VARIANT_RELEASE)-icedtea#" openjdk/jdk/make/common/shared/Defs.gmk
 
 # Build the re-written rhino jar
 mkdir -p rhino/{old,new}
@@ -772,106 +553,10 @@ java -cp rewriter com.redhat.rewriter.ClassRewriter \
    jar cfm ../rhino.jar META-INF/MANIFEST.MF sun
 )
 
-%if %{gcjbootstrap}
-
-mkdir -p bootstrap/boot
-
-# Copy over JAVA_HOME from /usr/lib/jvm/java-gcj/
-cp -aL %{_jvmdir}/java-gcj/* bootstrap/boot/ || : # broken symlinks can be non-fatal but may cause this to fail
-
-# Replace javac with a wrapper that does some magic
-cp -af %{SOURCE5} bootstrap/boot/bin/javac
-chmod u+x bootstrap/boot/bin/javac # SOURCE5 may not be +x
-sed -i -e s:@RT_JAR@:$PWD/bootstrap/boot/jre/lib/rt.jar:g bootstrap/boot/bin/javac
-
-# Link the native2ascii binary
-ln -sf /usr/bin/gnative2ascii bootstrap/boot/bin/native2ascii
-
-# We don't need a disassebler, fake it
-echo "#!/bin/sh
-exit 0" > bootstrap/boot/bin/javap
-chmod u+rx bootstrap/boot/bin/javap # We need to run this during build
-
-# Modules directory
-mkdir -p bootstrap/boot/lib/modules
-
-# jdk1.6.0 link
-rm -f bootstrap/jdk1.6.0
-ln -sf boot bootstrap/jdk1.6.0
-
-# Update rt.jar with newer classes
-# Extra classes to compile for reasons like
-# http://gcc.gnu.org/bugzilla/show_bug.cgi?id=42003
-echo "openjdk-boot/jdk/src/share/classes/java/util/regex/Matcher.java 
-openjdk-boot/jdk/src/share/classes/javax/management/remote/JMXServiceURL.java 
-openjdk-boot/jdk/src/share/classes/javax/management/modelmbean/ModelMBeanInfo.java 
-openjdk-boot/jdk/src/share/classes/javax/swing/plaf/basic/BasicDirectoryModel.java
-openjdk-boot/langtools/src/share/classes/javax/tools/JavaFileManager.java" > rt-source-files
-
-mkdir -p rt
-bootstrap/jdk1.6.0/bin/javac -g -encoding utf-8    -source 6 -target 6 -d rt \
-  -classpath %{_jvmdir}/java-gcj/jre/lib/rt.jar \
-  -sourcepath 'generated:openjdk-boot/jdk/src/share/classes:openjdk-boot/jdk/src/solaris/classes:openjdk-boot/langtools/src/share/classes:openjdk-boot/corba/src/share/classes' \
-  -bootclasspath "\'\'" @rt-source-files
-
-pushd rt
-zip -qur ../bootstrap/jdk1.6.0/jre/lib/rt.jar *
-popd
-
-# clean up
-rm -f rt-source-files
-rm -rf rt
-
-# Build it
-pushd openjdk-boot
-cp -a ../generated generated.build
-chmod u+rwx generated.build
-
-export ALT_DROPS_DIR=$PWD/../drops
-export ALT_JDK_IMPORT_PATH="$PWD/../bootstrap/jdk1.6.0"
-
-# Set generic profile
-source jdk/make/jdk_generic_profile.sh
-
-make \
-  ANT="/usr/bin/ant" \
-  ALT_BOOTDIR="$PWD/../bootstrap/jdk1.6.0" \
-  ICEDTEA_RT="$PWD/../bootstrap/jdk1.6.0/jre/lib/rt.jar" \
-  HOTSPOT_BUILD_JOBS="$NUM_PROC" \
-  NO_DOCS="true" \
-  RHINO_JAR="$PWD/../rhino/rhino.jar" \
-  GENSRCDIR="$PWD/generated.build" \
-  DISABLE_NIMBUS="true" \
-  XSLT="/usr/bin/xsltproc" \
-  FT2_CFLAGS="-I/usr/include/freetype2 " \
-  FT2_LIBS="-lfreetype " \
-%ifnarch %{jit_arches}
-  LIBFFI_CFLAGS="`pkg-config --cflags libffi` " \
-  LIBFFI_LIBS="-lffi " \
-  ZERO_BUILD="true" \
-  ZERO_LIBARCH="%{archbuild}" \
-  ZERO_ARCHDEF="%{archdef}" \
-%ifarch ppc ppc64 s390 s390x
-  ZERO_ENDIANNESS="big" \
-%else
-  ZERO_ENDIANNESS="little" \
-%endif
-%endif
-  %{nil}
-
-export JDK_TO_BUILD_WITH=$PWD/build/linux-%{archbuild}/j2sdk-image
-
-popd
-
-%else
-
 export JDK_TO_BUILD_WITH=/usr/lib/jvm/java-openjdk
-
-%endif
 
 pushd openjdk >& /dev/null
 
-export ALT_DROPS_DIR=$PWD/../drops
 export ALT_BOOTDIR="$JDK_TO_BUILD_WITH"
 
 # Save old umask as jdk_generic_profile overwrites it
@@ -887,21 +572,18 @@ make \
   ANT="/usr/bin/ant" \
   DISTRO_NAME="Fedora" \
   DISTRO_PACKAGE_VERSION="fedora-%{release}-%{_arch}" \
-%ifarch %{jit_arches}
   JDK_UPDATE_VERSION=`printf "%02d" %{buildver}` \
-%else
-  JDK_UPDATE_VERSION="03" \
-%endif
   MILESTONE="fcs" \
   HOTSPOT_BUILD_JOBS="$NUM_PROC" \
   STATIC_CXX="false" \
   RHINO_JAR="$PWD/../rhino/rhino.jar" \
-  GENSRCDIR="$PWD/generated.build" \
   FT2_CFLAGS="-I/usr/include/freetype2 " \
   FT2_LIBS="-lfreetype " \
+  SYSTEM_ZLIB="true" \
   DEBUG_CLASSFILES="true" \
   DEBUG_BINARIES="true" \
   STRIP_POLICY="no_strip" \
+  ALT_OUTPUTDIR=%{buildoutputdir}
 %ifnarch %{jit_arches}
   LIBFFI_CFLAGS="`pkg-config --cflags libffi` " \
   LIBFFI_LIBS="-lffi " \
@@ -1088,7 +770,7 @@ cp -a %{buildoutputdir}/docs $RPM_BUILD_ROOT%{_javadocdir}/%{name}
 # Install icons and menu entries.
 for s in 16 24 32 48 ; do
   install -D -p -m 644 \
-    openjdk/jdk/src/solaris/classes/sun/awt/X11/java-icon${s}.png \
+    jdk8/jdk/src/solaris/classes/sun/awt/X11/java-icon${s}.png \
     $RPM_BUILD_ROOT%{_datadir}/icons/hicolor/${s}x${s}/apps/java-%{javaver}.png
 done
 
@@ -1444,139 +1126,5 @@ exit 0
 %doc %{buildoutputdir}/j2sdk-image/jre/LICENSE
 
 %changelog
-* Thu Aug 30 2012 jiri Vanek <jvanek@redhat.com> - 1.7.0.6-2.3.1.fc19.1
-- Updated to IcedTea-Forest 2.3.1
-- Resolves rhbz#RH852051, CVE-2012-4681: Reintroduce PackageAccessible checks 
-  removed in 6788531.
-- Commented out Patch500, java-1.7.0-openjdk-removing_jvisualvm_man.patch as
-  as already included in this Iced-Tea.
-- Will be nice to verify after next upstream sync if it is still upstreamed
-
-* Tue Aug 28 2012 Orcan Ogetbil <oget.fedora@gmail.com> - 1.7.0.6-2.3.fc19.1
-- Add symlink to Fedora's default soundfont rhbz#541466
-
-* Mon Aug 27 2012 Jiri Vanek <jvanek@redhat.com> - 1.7.0.6-2.3.fc19.1
-- Updated to latest IcedTea7-forest-2.3
-- Current build is u6
-- ALT_STRIP_POLICY replaced by STRIP_POLICY
-- Patch103 java-1.7.0-opendk-arm-fixes.patch split to itself and new 
-  Patch106 java-1.7.0-opendk-freetype-check-fix.patch by meaning. Both applied.
-- Added Patch500, java-1.7.0-openjdk-removing_jvisualvm_man.patch to remove 
-  jvisualvm manpages from processing
-
-* Thu Jul 19 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1:1.7.0.5-2.2.1.10
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_18_Mass_Rebuild
-
-* Mon Jul 09 2012 Deepak Bhole <dbhole@redhat.com> - 1.7.0.5-2.2.1.fc18.9
-- Added support to build older (2.1.1/u3/hs22) version on non-jit (secondary)
-  arches
-
-* Wed Jun 13 2012 jiri Vanek <jvanek@redhat.com> - 1.7.0.3-2.2.1fc18.8
-- Fixed broken provides sections
-- Changed java-devel requirement to be self's devel (java-1.7.0-openjdk-devel)
-
-* Mon Jun 11 2012 jiri Vanek <jvanek@redhat.com> - 1.7.0.3-2.2.1fc18.7
-- Used newly prepared tarball with security fixes
-- Bump to icedtea7-forest-2.2.1
-- _mandir/man1/jcmd-name.1 added to alternatives
-- Updated rhino.patch
-- Modified partially upstreamed patch302 - systemtap.patch
-- Temporarly disabled patch102 - java-1.7.0-openjdk-size_t.patch
-- Removed already upstreamed patches 104,107,108,301
-  - java-1.7.0-openjdk-arm-ftbfs.patch
-  - java-1.7.0-openjdk-system-zlib.patch
-  - java-1.7.0-openjdk-remove-mimpure-opt.patch
-  - systemtap-alloc-size-workaround.patch
-- patch 105 (java-1.7.0-openjdk-ppc-zero-jdk.patch) have become 104
-- patch 106 (java-1.7.0-openjdk-ppc-zero-hotspot.patch) have become 105
-- Added build requires zip, which was untill now  dependence  of dependence
-- Access gnome brridge jar forced to be 644
-
-* Fri May 25 2012 Deepak Bhole <dbhole@redhat.com> - 1.7.0.3-2.1.fc17.7
-- Miscellaneous fixes brought in from RHEL branch
-- Resolves: rhbz#825255: Added ALT_STRIP_POLICY so that debug info is not stripped
-- Moved Patch #7 (usage of system zlib) to #107
-
-* Tue May 01 2012 Deepak Bhole <dbhole@redhat.com> - 1.7.0.3-2.1.fc17.6
-- Removed VisualVM requirements
-- Obsoleted java-1.6.0-openjdk*
-- Added BR for zip
-
-* Mon Mar 26 2012 Deepak Bhole <dbhole@redhat.com> - 1.7.0.3-2.1.fc17.5
-- Added SystemTap fixes by Mark Wielaard
-
-* Sat Mar 24 2012 Dan HorÃ¡k <dan[at]danny.cz>> - 1.7.0.3-2.1.fc17.4
-- update paths in the ppc patches, add missing snippet
-
-* Wed Mar 21 2012 Deepak Bhole <dbhole@redhat.com> - 1.7.0.3-2.1.fc17.3
-- Reverted fix for rhbz#740762
-- Fixed PPC/PPC64 build (rh804136) -- added patches from Chris Phillips
-- Moved OpenJDK specific patches to 1XX series
-
-* Mon Mar 12 2012 Deepak Bhole <dbhole@redhat.com> - 1.7.0.3-2.1.fc17.2
-- Resolved rhbz#740762: java.library.path is missing some paths
-- Unified spec file for x86, x86_64, ARM and s390
-  - Integrated changes from Dan HorÃ¡k <dhorak@redhat.com> for Zero/s390
-  - Integrated changes from Chris Phillips <chphilli@redhat.com> for Zero/ARM
-
-* Fri Feb 24 2012 Deepak Bhole <dbhole@redhat.com> - 1.7.0.3-2.1.fc17.1
-- Added flag so that debuginfo is built into classfiles (rhbz# 796400)
-- Updated rhino.patch to build scripting support (rhbz# 796398)
-
-* Tue Feb 14 2012 Deepak Bhole <dbhole@redhat.com> - 1.7.0.3-2.1
-- Updated to OpenJDK7u3/IcedTea7 2.1
-- Security fixes:
-  - S7112642, CVE-2012-0497: Incorrect checking for graphics rendering object
-  - S7082299, CVE-2011-3571: AtomicReferenceArray insufficient array type check
-  - S7110687, CVE-2012-0503: Unrestricted use of TimeZone.setDefault
-  - S7110700, CVE-2012-0505: Incomplete info in the deserialization exception
-  - S7110683, CVE-2012-0502: KeyboardFocusManager focus stealing
-  - S7088367, CVE-2011-3563: JavaSound incorrect bounds check
-  - S7126960, CVE-2011-5035: Add property to limit number of request headers to the HTTP Server
-  - S7118283, CVE-2012-0501: Off-by-one bug in ZIP reading code
-  - S7110704, CVE-2012-0506: CORBA fix
-- Add patch to fix compilation with GCC 4.7
-
-* Tue Nov 15 2011 Deepak Bhole <dbhole@redhat.com> - 1.7.0.1-2.0.3
-- Added patch to fix bug in jdk_generic_profile.sh
-- Compile with generic profile to use system libraries
-- Made remove-intree-libraries.sh more robust
-- Added lcms requirement
-- Added patch to fix glibc name clash
-- Updated java version to include -icedtea
-
-* Sun Nov 06 2011 Deepak Bhole <dbhole@redhat.com> - 1.7.0.1-2.0.2
-- Added missing changelog entry
-
-* Sun Nov 06 2011 Deepak Bhole <dbhole@redhat.com> - 1.7.0.1-2.0.1
-- Updated to IcedTea 2.0 tag in the IcedTea OpenJDK7 forest
-- Removed obsoleted patches
-- Added system timezone support
-- Revamp version/release naming scheme to make it proper
-- Security fixes
-  - S7000600, CVE-2011-3547: InputStream skip() information leak
-  - S7019773, CVE-2011-3548: mutable static AWTKeyStroke.ctor
-  - S7023640, CVE-2011-3551: Java2D TransformHelper integer overflow
-  - S7032417, CVE-2011-3552: excessive default UDP socket limit under SecurityManager
-  - S7046823, CVE-2011-3544: missing SecurityManager checks in scripting engine
-  - S7055902, CVE-2011-3521: IIOP deserialization code execution
-  - S7057857, CVE-2011-3554: insufficient pack200 JAR files uncompress error checks
-  - S7064341, CVE-2011-3389: HTTPS: block-wise chosen-plaintext attack against SSL/TLS (BEAST)
-  - S7070134, CVE-2011-3558: HotSpot crashes with sigsegv from PorterStemmer
-  - S7077466, CVE-2011-3556: RMI DGC server remote code execution
-  - S7083012, CVE-2011-3557: RMI registry privileged code execution
-  - S7096936, CVE-2011-3560: missing checkSetFactory calls in HttpsURLConnection
-
-* Mon Aug 29 2011 Deepak Bhole <dbhole@redhat.com> - 1.7.0.0-0.1.20110823.1
-- Provide a "7" version of items to enfore F-16 policy of no Java 7 builds
-- Resolves: rhbz#728706,  patch from Ville Skyttä <ville.skytta at iki dot fi>
-
-* Fri Aug 05 2011 Deepak Bhole <dbhole@redhat.com> - 1.7.0.0-0.1.20110803
-- Use a newer snapshot and forest on classpath.org rather than on openjdk.net
-- Added in-tree-removal script to remove libraries that we manually link
-- Updated snapshots
-- Added DISTRO_NAME and FreeType header/lib locations
-- Removed application of patch100 and patch 113 (now in forest)
-
-* Wed Aug 03 2011 Deepak Bhole <dbhole@redhat.com> - 1.7.0.0-0.1.20110729
-- Initial build from java-1.6.0-openjdk RPM
+* Tue Sep 04 2012 Andrew John Hughes <gnu.andrew@redhat.com> - 1.8.0.0-0.1.20120904
+- Initial build from java-1.7.0-openjdk RPM

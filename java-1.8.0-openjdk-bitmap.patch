@@ -1,6 +1,6 @@
-diff -up openjdk/hotspot/src/share/vm/utilities/bitMap.inline.hpp.s390 openjdk/hotspot/src/share/vm/utilities/bitMap.inline.hpp
---- openjdk/hotspot/src/share/vm/utilities/bitMap.inline.hpp.s390	2012-02-10 08:30:46.378435291 -0500
-+++ openjdk/hotspot/src/share/vm/utilities/bitMap.inline.hpp	2012-02-10 08:47:27.478427892 -0500
+diff -up jdk8/hotspot/src/share/vm/utilities/bitMap.inline.hpp.s390 openjdk/hotspot/src/share/vm/utilities/bitMap.inline.hpp
+--- jdk8/hotspot/src/share/vm/utilities/bitMap.inline.hpp.s390	2012-02-10 08:30:46.378435291 -0500
++++ jdk8/hotspot/src/share/vm/utilities/bitMap.inline.hpp	2012-02-10 08:47:27.478427892 -0500
 @@ -52,16 +52,16 @@ inline void BitMap::clear_bit(idx_t bit)
  
  inline bool BitMap::par_set_bit(idx_t bit) {

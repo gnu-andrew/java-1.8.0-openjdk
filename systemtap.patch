@@ -1,6 +1,6 @@
-diff -Nru openjdk.orig/hotspot/make/linux/makefiles/dtrace.make openjdk/hotspot/make/linux/makefiles/dtrace.make
+diff -Nru openjdk.orig/hotspot/make/linux/makefiles/dtrace.make jdk8/hotspot/make/linux/makefiles/dtrace.make
 --- openjdk.orig/hotspot/make/linux/makefiles/dtrace.make	2012-02-22 14:54:31.000000000 +0000
-+++ openjdk/hotspot/make/linux/makefiles/dtrace.make	2012-03-18 18:54:13.482968139 +0000
++++ jdk8/hotspot/make/linux/makefiles/dtrace.make	2012-03-18 18:54:13.482968139 +0000
 @@ -25,3 +25,7 @@
  # Linux does not build jvm_db
  LIBJVM_DB =
@@ -9,9 +9,9 @@ diff -Nru openjdk.orig/hotspot/make/linux/makefiles/dtrace.make openjdk/hotspot/
 +CFLAGS += -DDTRACE_ENABLED
 +
 +# It doesn't support HAVE_DTRACE_H though.
-diff -Nru openjdk.orig/hotspot/src/share/vm/prims/jni.cpp openjdk/hotspot/src/share/vm/prims/jni.cpp
+diff -Nru openjdk.orig/hotspot/src/share/vm/prims/jni.cpp jdk8/hotspot/src/share/vm/prims/jni.cpp
 --- openjdk.orig/hotspot/src/share/vm/prims/jni.cpp	2012-02-22 14:54:31.000000000 +0000
-+++ openjdk/hotspot/src/share/vm/prims/jni.cpp	2012-03-18 18:54:13.502968466 +0000
++++ jdk8/hotspot/src/share/vm/prims/jni.cpp	2012-03-18 18:54:13.502968466 +0000
 @@ -2818,10 +2818,7 @@
  JNI_QUICK_ENTRY(void, jni_Set##Result##Field(JNIEnv *env, jobject obj, jfieldID fieldID, Argument value)) \
    JNIWrapper("Set" XSTR(Result) "Field"); \
@@ -37,7 +37,7 @@ diff -Nru openjdk.orig/hotspot/src/share/vm/prims/jni.cpp openjdk/hotspot/src/sh
    JNIid* id = jfieldIDWorkaround::from_static_jfieldID(fieldID); \
    assert(id->is_static_field_id(), "invalid static field id"); \
 --- openjdk.orig/hotspot/src/share/vm/utilities/dtrace.hpp	2012-02-22 15:54:31.000000000 +0100
-+++ openjdk/hotspot/src/share/vm/utilities/dtrace.hpp	2012-03-27 13:12:15.857491730 +0200
++++ jdk8/hotspot/src/share/vm/utilities/dtrace.hpp	2012-03-27 13:12:15.857491730 +0200
 @@ -1,5 +1,6 @@
  /*
   * Copyright (c) 2005, 2010, Oracle and/or its affiliates. All rights reserved.

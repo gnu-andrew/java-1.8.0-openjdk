@@ -1,6 +1,6 @@
-diff -up openjdk/jdk/make/common/shared/Sanity.gmk.sav openjdk/jdk/make/common/shared/Sanity.gmk
---- openjdk/jdk/make/common/shared/Sanity.gmk.sav	2012-02-14 16:12:48.000000000 -0500
-+++ openjdk/jdk/make/common/shared/Sanity.gmk	2012-03-07 17:31:26.153840755 -0500
+diff -up jdk8/jdk/make/common/shared/Sanity.gmk.sav openjdk/jdk/make/common/shared/Sanity.gmk
+--- jdk8/jdk/make/common/shared/Sanity.gmk.sav	2012-02-14 16:12:48.000000000 -0500
++++ jdk8/jdk/make/common/shared/Sanity.gmk	2012-03-07 17:31:26.153840755 -0500
 @@ -814,12 +814,12 @@ ifdef OPENJDK
  	@(($(CD) $(BUILDDIR)/tools/freetypecheck && $(MAKE)) || \
  	    $(ECHO) "Failed to build freetypecheck." ) > $@
