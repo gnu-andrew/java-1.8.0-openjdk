@@ -283,6 +283,7 @@ BuildRequires: rhino
 #BuildRequires: redhat-lsb
 BuildRequires: zip
 BuildRequires: java-1.7.0-openjdk-devel
+BuildRequires: hostname
 # Mauve build requirements.
 BuildRequires: xorg-x11-server-Xvfb
 BuildRequires: xorg-x11-fonts-Type1
@@ -555,7 +556,7 @@ java -cp rewriter com.redhat.rewriter.ClassRewriter \
 
 export JDK_TO_BUILD_WITH=/usr/lib/jvm/java-openjdk
 
-pushd openjdk >& /dev/null
+pushd jdk8 >& /dev/null
 
 export ALT_BOOTDIR="$JDK_TO_BUILD_WITH"
 
@@ -583,7 +584,7 @@ make \
   DEBUG_CLASSFILES="true" \
   DEBUG_BINARIES="true" \
   STRIP_POLICY="no_strip" \
-  ALT_OUTPUTDIR=%{buildoutputdir}
+  ALT_OUTPUTDIR="$PWD/../%{buildoutputdir}"
 %ifnarch %{jit_arches}
   LIBFFI_CFLAGS="`pkg-config --cflags libffi` " \
   LIBFFI_LIBS="-lffi " \
@@ -896,7 +897,6 @@ alternatives \
   --slave %{_jvmdir}/java java_sdk %{_jvmdir}/%{sdklnk} \
   --slave %{_jvmjardir}/java java_sdk_exports %{_jvmjardir}/%{sdklnk} \
   --slave %{_bindir}/appletviewer appletviewer %{sdkbindir}/appletviewer \
-  --slave %{_bindir}/apt apt %{sdkbindir}/apt \
   --slave %{_bindir}/extcheck extcheck %{sdkbindir}/extcheck \
   --slave %{_bindir}/jar jar %{sdkbindir}/jar \
   --slave %{_bindir}/jarsigner jarsigner %{sdkbindir}/jarsigner \
@@ -924,8 +924,6 @@ alternatives \
   --slave %{_bindir}/xjc xjc %{sdkbindir}/xjc \
   --slave %{_mandir}/man1/appletviewer.1$ext appletviewer.1$ext \
   %{_mandir}/man1/appletviewer-%{name}.1$ext \
-  --slave %{_mandir}/man1/apt.1$ext apt.1$ext \
-  %{_mandir}/man1/apt-%{name}.1$ext \
   --slave %{_mandir}/man1/extcheck.1$ext extcheck.1$ext \
   %{_mandir}/man1/extcheck-%{name}.1$ext \
   --slave %{_mandir}/man1/jar.1$ext jar.1$ext \
@@ -1070,7 +1068,6 @@ exit 0
 %{_datadir}/applications/*jconsole.desktop
 %{_datadir}/applications/*policytool.desktop
 %{_mandir}/man1/appletviewer-%{name}.1*
-%{_mandir}/man1/apt-%{name}.1*
 %{_mandir}/man1/extcheck-%{name}.1*
 %{_mandir}/man1/idlj-%{name}.1*
 %{_mandir}/man1/jar-%{name}.1*
