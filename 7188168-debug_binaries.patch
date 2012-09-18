@@ -1,0 +1,119 @@
+# HG changeset patch
+# User dcubed
+# Date 1343944454 25200
+# Node ID 282abd0fd8785f94a85e69a0f608f5fe69f5a288
+# Parent  8e69438de9c69af07cb01f59ddfa868ccb6415d3
+7188168: 7071904 broke the DEBUG_BINARIES option on Linux
+Summary: Change DEBUG_BINARIES option logic to be more clear.
+Reviewed-by: fparain, andrew
+
+diff --git a/make/linux/makefiles/adlc.make b/make/linux/makefiles/adlc.make
+--- jdk8/hotspot/make/linux/makefiles/adlc.make
++++ jdk8/hotspot/make/linux/makefiles/adlc.make
+@@ -1,5 +1,5 @@
+ #
+-# Copyright (c) 1999, 2011, Oracle and/or its affiliates. All rights reserved.
++# Copyright (c) 1999, 2012, Oracle and/or its affiliates. All rights reserved.
+ # DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
+ #
+ # This code is free software; you can redistribute it and/or modify it
+@@ -133,8 +133,10 @@
+ # Note that product files are updated via "mv", which is atomic.
+ TEMPDIR := $(OUTDIR)/mktmp$(shell echo $$$$)
+ 
+-# Debuggable by default
+-CFLAGS += -g
++ifneq ($(DEBUG_BINARIES), true)
++  # Debuggable by default (unless already done by DEBUG_BINARIES)
++  CFLAGS += -g
++endif
+ 
+ # Pass -D flags into ADLC.
+ ADLCFLAGS += $(SYSDEFS)
+diff --git a/make/linux/makefiles/gcc.make b/make/linux/makefiles/gcc.make
+--- jdk8/hotspot/make/linux/makefiles/gcc.make
++++ jdk8/hotspot/make/linux/makefiles/gcc.make
+@@ -215,47 +215,46 @@
+ #------------------------------------------------------------------------
+ # Debug flags
+ 
+-# Use the stabs format for debugging information (this is the default
+-# on gcc-2.91). It's good enough, has all the information about line
+-# numbers and local variables, and libjvm_g.so is only about 16M.
+-# Change this back to "-g" if you want the most expressive format.
+-# (warning: that could easily inflate libjvm_g.so to 150M!)
+-# Note: The Itanium gcc compiler crashes when using -gstabs.
+-DEBUG_CFLAGS/ia64  = -g
+-DEBUG_CFLAGS/amd64 = -g
+-DEBUG_CFLAGS/arm   = -g
+-DEBUG_CFLAGS/ppc   = -g
+-DEBUG_CFLAGS += $(DEBUG_CFLAGS/$(BUILDARCH))
+-ifeq ($(DEBUG_CFLAGS/$(BUILDARCH)),)
+-DEBUG_CFLAGS += -gstabs
+-endif
+-
+-ifeq ($(ENABLE_FULL_DEBUG_SYMBOLS),1)
+-  FASTDEBUG_CFLAGS/ia64  = -g
+-  FASTDEBUG_CFLAGS/amd64 = -g
+-  FASTDEBUG_CFLAGS/arm   = -g
+-  FASTDEBUG_CFLAGS/ppc   = -g
+-  FASTDEBUG_CFLAGS += $(DEBUG_CFLAGS/$(BUILDARCH))
+-  ifeq ($(FASTDEBUG_CFLAGS/$(BUILDARCH)),)
+-    FASTDEBUG_CFLAGS += -gstabs
++# DEBUG_BINARIES uses full -g debug information for all configs
++ifeq ($(DEBUG_BINARIES), true)
++  CFLAGS += -g
++else
++  # Use the stabs format for debugging information (this is the default
++  # on gcc-2.91). It's good enough, has all the information about line
++  # numbers and local variables, and libjvm_g.so is only about 16M.
++  # Change this back to "-g" if you want the most expressive format.
++  # (warning: that could easily inflate libjvm_g.so to 150M!)
++  # Note: The Itanium gcc compiler crashes when using -gstabs.
++  DEBUG_CFLAGS/ia64  = -g
++  DEBUG_CFLAGS/amd64 = -g
++  DEBUG_CFLAGS/arm   = -g
++  DEBUG_CFLAGS/ppc   = -g
++  DEBUG_CFLAGS += $(DEBUG_CFLAGS/$(BUILDARCH))
++  ifeq ($(DEBUG_CFLAGS/$(BUILDARCH)),)
++    DEBUG_CFLAGS += -gstabs
+   endif
+-
+-  OPT_CFLAGS/ia64  = -g
+-  OPT_CFLAGS/amd64 = -g
+-  OPT_CFLAGS/arm   = -g
+-  OPT_CFLAGS/ppc   = -g
+-  OPT_CFLAGS += $(OPT_CFLAGS/$(BUILDARCH))
+-  ifeq ($(OPT_CFLAGS/$(BUILDARCH)),)
+-    OPT_CFLAGS += -gstabs
++  
++  ifeq ($(ENABLE_FULL_DEBUG_SYMBOLS),1)
++    FASTDEBUG_CFLAGS/ia64  = -g
++    FASTDEBUG_CFLAGS/amd64 = -g
++    FASTDEBUG_CFLAGS/arm   = -g
++    FASTDEBUG_CFLAGS/ppc   = -g
++    FASTDEBUG_CFLAGS += $(DEBUG_CFLAGS/$(BUILDARCH))
++    ifeq ($(FASTDEBUG_CFLAGS/$(BUILDARCH)),)
++      FASTDEBUG_CFLAGS += -gstabs
++    endif
++  
++    OPT_CFLAGS/ia64  = -g
++    OPT_CFLAGS/amd64 = -g
++    OPT_CFLAGS/arm   = -g
++    OPT_CFLAGS/ppc   = -g
++    OPT_CFLAGS += $(OPT_CFLAGS/$(BUILDARCH))
++    ifeq ($(OPT_CFLAGS/$(BUILDARCH)),)
++      OPT_CFLAGS += -gstabs
++    endif
+   endif
+ endif
+ 
+-# DEBUG_BINARIES overrides everything, use full -g debug information
+-ifeq ($(DEBUG_BINARIES), true)
+-  DEBUG_CFLAGS = -g
+-  CFLAGS += $(DEBUG_CFLAGS)
+-endif
+-
+ # If we are building HEADLESS, pass on to VM
+ # so it can set the java.awt.headless property
+ ifdef HEADLESS

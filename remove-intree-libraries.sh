@@ -21,6 +21,7 @@ if [ ! -f ${JPEG_SRC}/jdhuff.c ]; then # some file that sound definitely exist
 	exit 1
 fi	
 
+if false ; then
 rm -vf ${JPEG_SRC}/jcomapi.c
 rm -vf ${JPEG_SRC}/jdapimin.c
 rm -vf ${JPEG_SRC}/jdapistd.c
@@ -66,26 +67,32 @@ rm -vf ${JPEG_SRC}/jfdctflt.c
 rm -vf ${JPEG_SRC}/jfdctfst.c
 rm -vf ${JPEG_SRC}/jfdctint.c
 rm -vf ${JPEG_SRC}/README
+fi
 
 echo "Removing giflib"
 if [ ! -d ${GIF_SRC} ]; then
 	echo "${GIF_SRC} does not exist. Refusing to proceed."
 	exit 1
 fi	
+if false; then
 rm -rvf ${GIF_SRC}
+fi
 
 echo "Removing libpng"
 if [ ! -d ${PNG_SRC} ]; then
 	echo "${PNG_SRC} does not exist. Refusing to proceed."
 	exit 1
 fi	
+if false; then
 rm -rvf ${PNG_SRC}
+fi
 
 echo "Removing lcms"
 if [ ! -d ${LCMS_SRC} ]; then
 	echo "${LCMS_SRC} does not exist. Refusing to proceed."
 	exit 1
 fi
+if false; then
 rm -vf ${LCMS_SRC}/cmscam02.c
 rm -vf ${LCMS_SRC}/cmscgats.c
 rm -vf ${LCMS_SRC}/cmscnvrt.c
@@ -113,4 +120,4 @@ rm -vf ${LCMS_SRC}/cmsxform.c
 rm -vf ${LCMS_SRC}/lcms2.h
 rm -vf ${LCMS_SRC}/lcms2_internal.h
 rm -vf ${LCMS_SRC}/lcms2_plugin.h
-
+fi

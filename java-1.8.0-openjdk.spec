@@ -195,7 +195,10 @@ Source10: nss.cfg
 Source11: pulseaudio.tar.gz
 
 # Removed libraries that we link instead
-#Source12: remove-intree-libraries.sh
+Source12: remove-intree-libraries.sh
+
+# Ensure we aren't using the limited crypto policy
+Source13: TestCryptoLevel.java
 
 # For primary arches, build latest and for secondary, use hs22
 # base (icedtea-2.2.1 tag)
@@ -244,6 +247,18 @@ Patch105: %{name}-ppc-zero-hotspot.patch
 Patch106: %{name}-ppc-zero-corba.patch
 
 Patch107: %{name}-freetype-check-fix.patch
+
+# S7188168; don't build with STABS if DEBUG_BINARIES is on
+Patch108: 7188168-debug_binaries.patch
+
+# S7192804: don't install visualvm manpage on OpenJDK
+Patch109: 7192804-visualvm.patch
+
+# Allow the unlimited crypto policy to be installed
+Patch110: policy.patch
+
+# S7110151: Use underlying platform's zlib library for Java zlib support
+Patch111: 7110151-zlib.patch
 
 #
 # Optional component packages
@@ -354,11 +369,12 @@ Provides: java-sasl = %{epoch}:%{version}
 Provides: java-fonts = %{epoch}:%{version}
 
 # Obsolete older 1.6 packages as it cannot use the new bytecode
-Obsoletes: java-1.6.0-openjdk
-Obsoletes: java-1.6.0-openjdk-demo
-Obsoletes: java-1.6.0-openjdk-devel
-Obsoletes: java-1.6.0-openjdk-javadoc
-Obsoletes: java-1.6.0-openjdk-src
+# Commented out while this is still in testing stages
+#Obsoletes: java-1.6.0-openjdk
+#Obsoletes: java-1.6.0-openjdk-demo
+#Obsoletes: java-1.6.0-openjdk-devel
+#Obsoletes: java-1.6.0-openjdk-javadoc
+#Obsoletes: java-1.6.0-openjdk-src
 
 %description
 The OpenJDK runtime environment.
@@ -514,6 +530,10 @@ patch -l -p0 < %{PATCH103}
 %endif
 
 patch -l -p0 < %{PATCH107}
+patch -l -p0 < %{PATCH108}
+patch -l -p0 < %{PATCH109}
+patch -l -p0 < %{PATCH110}
+patch -l -p0 < %{PATCH111}
 
 %ifarch ppc ppc64
 # PPC fixes
@@ -584,7 +604,9 @@ make \
   DEBUG_CLASSFILES="true" \
   DEBUG_BINARIES="true" \
   STRIP_POLICY="no_strip" \
-  ALT_OUTPUTDIR="$PWD/../%{buildoutputdir}"
+  ALT_OUTPUTDIR="$PWD/../%{buildoutputdir}" \
+  UNLIMITED_CRYPTO="true" \
+  DISABLE_INTREE_EC="true" \
 %ifnarch %{jit_arches}
   LIBFFI_CFLAGS="`pkg-config --cflags libffi` " \
   LIBFFI_LIBS="-lffi " \
@@ -628,6 +650,10 @@ popd
 
 # Copy tz.properties
 echo "sun.zoneinfo.dir=/usr/share/javazi" >> $JAVA_HOME/jre/lib/tz.properties
+
+# Check unlimited policy has been used
+$JAVA_HOME/bin/javac -d . %{SOURCE13}
+$JAVA_HOME/bin/java TestCryptoLevel
 
 %if %{runtests}
 # Run jtreg test suite.
@@ -1044,7 +1070,8 @@ exit 0
 %{_mandir}/man1/unpack200-%{name}.1*
 %{_jvmdir}/%{jredir}/lib/security/nss.cfg
 %{_jvmdir}/%{jredir}/lib/audio/
-
+%{_jvmdir}/%{jredir}/lib/security/US_export_policy.jar
+%{_jvmdir}/%{jredir}/lib/security/local_policy.jar
 
 %files devel
 %defattr(-,root,root,-)
@@ -1123,5 +1150,5 @@ exit 0
 %doc %{buildoutputdir}/j2sdk-image/jre/LICENSE
 
 %changelog
-* Tue Sep 04 2012 Andrew John Hughes <gnu.andrew@redhat.com> - 1.8.0.0-0.1.20120904
+* Tue Sep 04 2012 Andrew John Hughes <gnu.andrew@redhat.com> - 1:1.8.0.0-b53.1
 - Initial build from java-1.7.0-openjdk RPM
