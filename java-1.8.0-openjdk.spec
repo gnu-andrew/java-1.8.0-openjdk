@@ -733,9 +733,6 @@ Patch13: libjpeg-turbo-1.4-compat.patch
 # OpenJDK specific patches
 #
 
-# http://hg.openjdk.java.net/jdk9/hs/hotspot/rev/471b684ff43e
-# allow build on Linux 4.x kernels
-Patch99: java-1.8.0-openjdk-linux-4.x.patch
 # JVM heap size changes for s390 (thanks to aph)
 Patch100: %{name}-s390-java-opts.patch
 # Type fixing for s390
@@ -750,14 +747,16 @@ Patch300: jstack-pr1845.patch
 # Fixes StackOverflowError on ARM32 bit Zero. See RHBZ#1206656
 Patch403: rhbz1206656_fix_current_stack_pointer.patch
 
-# S8087156, PR2444: SetupNativeCompilation ignores CFLAGS_release for cpp files (in 8u60)
-Patch503: pr2444.patch
 # PR2095, RH1163501: 2048-bit DH upper bound too small for Fedora infrastructure (sync with IcedTea 2.x)
 Patch504: rh1163501.patch
-# Patch for upstream JDK-8078666 (RHBZ#1208369)
-Patch505: 1208369_memory_leak_gcc5.patch
-Patch506: gif4.1.patch
+# S4890063, PR2304, RH1214835: HPROF: default text truncated when using doe=n option (upstreaming post-CPU 2015/07)
+Patch511: rh1214835.patch
 
+# RH1191652; fix name of ppc64le architecture
+Patch600: %{name}-rh1191652-hotspot.patch
+Patch601: %{name}-rh1191652-root.patch
+Patch602: %{name}-rh1191652-jdk.patch
+Patch603: %{name}-rh1191652-hotspot-aarch64.patch
 
 Patch9999: enableArm64.patch
 
@@ -1015,8 +1014,6 @@ cp %{SOURCE101} openjdk/common/autoconf/build-aux/
 # Remove libraries that are linked
 sh %{SOURCE12}
 
-%patch99
-
 # Add AArch64 support to configure & JDK build
 %patch9999
 
@@ -1043,10 +1040,19 @@ sh %{SOURCE12}
 # Zero PPC fixes.
 %patch403
 
-%patch503
+# HotSpot ppc64le patch is different depending
+# on whether we are using 2.5 or 2.6 HotSpot.
+%ifarch %{aarch64}
+%patch603
+%else
+%patch600
+%endif
+
+%patch601
+%patch602
+
 %patch504
-%patch505
-%patch506
+%patch511
 
 # Extract systemtap tapsets
 %if %{with_systemtap}
@@ -1734,6 +1740,15 @@ end
 * Thu Jul 16 2015 Jiri Vanek <jvanek@redhat.com> - 1:1.8.0.60-2.b24
 - updated to security u60-b24
 - moved to openjdk instead of jdk8 topdir in sources
+- removed upstreamed patch99 java-1.8.0-openjdk-linux-4.x.patch
+- removed upstreamed patch503 pr2444.patch
+- removed upstreamed patch505 1208369_memory_leak_gcc5.patch
+- removed upstreamed patch506: gif4.1.patch
+ - note: usptream version is suspicious
+  GIFLIB_MAJOR >= 5 SplashStreamGifInputFunc, NULL
+  ELSE SplashStreamGifInputFunc
+ - but the condition seems to be viceversa
+
 
 * Mon Jun 22 2015 Omair Majid <omajid@redhat.com> - 1:1.8.0.60-7.b16
 - Require javapackages-tools instead of jpackage-utils.
