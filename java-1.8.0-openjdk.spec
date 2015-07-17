@@ -180,7 +180,8 @@ if [ "$1" -gt 1 ]; then
   javasecurity="%{_jvmdir}/%{uniquesuffix}/jre/lib/security/java.security"
   sum=$(md5sum "${javasecurity}" | cut -d' ' -f1)
   # This is the md5sum of an unmodified java.security file
-  if [ "${sum}" = '1690ac33955594f71dc952c9e83fd396' -o \
+  if [ "${sum}" = '1690ac33955594f71dc952c9e83fd396' -o \\
+       "${sum}" = 'b138695d0c0ea947e64a21a627d973ba' -o \\
        "${sum}" = 'd17958676bdb9f9d941c8a59655311fb' ]; then
     if [ -f "${javasecurity}.rpmnew" ]; then
       mv -f "${javasecurity}.rpmnew" "${javasecurity}"
@@ -660,7 +661,7 @@ Obsoletes: java-1.7.0-openjdk-accessibility%1
 
 Name:    java-%{javaver}-%{origin}
 Version: %{javaver}.%{updatever}
-Release: 2.%{buildver}%{?dist}
+Release: 3.%{buildver}%{?dist}
 # java-1.5.0-ibm from jpackage.org set Epoch to 1 for unknown reasons,
 # and this change was brought into RHEL-4.  java-1.5.0-ibm packages
 # also included the epoch in their virtual provides.  This created a
@@ -1737,6 +1738,11 @@ end
 %endif
 
 %changelog
+* Fri Jul 17 2015 Jiri Vanek <jvanek@redhat.com> - 1:1.8.0.60-3.b24
+- added one more md5sum test (thanx to Sewerein!)
+ - I guess one more missing
+- doubled slash in md5sum test in post
+
 * Thu Jul 16 2015 Jiri Vanek <jvanek@redhat.com> - 1:1.8.0.60-2.b24
 - updated to security u60-b24
 - moved to openjdk instead of jdk8 topdir in sources
