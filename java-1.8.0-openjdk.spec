@@ -1739,7 +1739,7 @@ end
 
 %changelog
 * Fri Jul 17 2015 Jiri Vanek <jvanek@redhat.com> - 1:1.8.0.60-3.b24
-- added one more md5sum test (thanx to Sewerein!)
+- added one more md5sum test (thanx to Severin!)
  - I guess one more missing
 - doubled slash in md5sum test in post
 
