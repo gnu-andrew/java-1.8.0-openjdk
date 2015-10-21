@@ -107,6 +107,13 @@
 %global with_systemtap 0
 %endif
 
+# AArch64 currently uses a different OpenJDK source tarball
+%ifarch %{aarch64}
+%global openjdk_sourceid 1
+%else
+%global openjdk_sourceid 0
+%endif
+
 # Convert an absolute path to a relative path.  Each symbolic link is
 # specified relative to the directory in which it is installed so that
 # it will resolve properly within chrooted installations.
@@ -116,10 +123,10 @@
 
 # Standard JPackage naming and versioning defines.
 %global origin          openjdk
-%global updatever       60
-%global buildver        b27
-%global aarch64_updatever 60
-%global aarch64_buildver b24.2
+%global updatever       65
+%global buildver        b17
+%global aarch64_updatever 65
+%global aarch64_buildver b17
 %global aarch64_changesetid aarch64-jdk8u%{aarch64_updatever}-%{aarch64_buildver}
 # priority must be 7 digits in total
 %global priority        18000%{updatever}
@@ -182,7 +189,9 @@ if [ "$1" -gt 1 ]; then
   # This is the md5sum of an unmodified java.security file
   if [ "${sum}" = '1690ac33955594f71dc952c9e83fd396' -o \\
        "${sum}" = 'b138695d0c0ea947e64a21a627d973ba' -o \\
-       "${sum}" = 'd17958676bdb9f9d941c8a59655311fb' ]; then
+       "${sum}" = 'd17958676bdb9f9d941c8a59655311fb' -o \\
+       "${sum}" = '5463aef7dbf0bbcfe79e0336a7f92701' -o \\
+       "${sum}" = '400cc64d4dd31f36dc0cc2c701d603db' ]; then
     if [ -f "${javasecurity}.rpmnew" ]; then
       mv -f "${javasecurity}.rpmnew" "${javasecurity}"
     fi
@@ -661,7 +670,7 @@ Obsoletes: java-1.7.0-openjdk-accessibility%1
 
 Name:    java-%{javaver}-%{origin}
 Version: %{javaver}.%{updatever}
-Release: 14.%{buildver}%{?dist}
+Release: 3.%{buildver}%{?dist}
 # java-1.5.0-ibm from jpackage.org set Epoch to 1 for unknown reasons,
 # and this change was brought into RHEL-4.  java-1.5.0-ibm packages
 # also included the epoch in their virtual provides.  This created a
@@ -679,11 +688,11 @@ Group:   Development/Languages
 License:  ASL 1.1 and ASL 2.0 and GPL+ and GPLv2 and GPLv2 with exceptions and LGPL+ and LGPLv2 and MPLv1.0 and MPLv1.1 and Public Domain and W3C
 URL:      http://openjdk.java.net/
 
-# Source from upstrem OpenJDK8 project. To regenerate, use
-# ./generate_source_tarball.sh jdk8u jdk8u jdk8u%%{updatever}-%%{buildver}
-# ./generate_source_tarball.sh aarch64-port jdk8 %%{aarch64_hg_tag}
-Source0:  jdk8u60-jdk8u%{updatever}-%{buildver}.tar.xz
-Source1:  jdk8-%{aarch64_changesetid}.tar.xz
+# Sources from internal security patched trees.
+# ./generate_local_tarball.sh <path to 8u65 sources> jdk8u%%{updatever}-%%{buildver}
+# ./generate_local_tarball.sh <path to aarch64-port 8u65 sources> %%{aarch64_changesetid}
+Source0:  jdk8u-jdk8u%{updatever}-%{buildver}.tar.xz
+Source1:  jdk8u-%{aarch64_changesetid}.tar.xz
 
 # Custom README for -src subpackage
 Source2:  README.src
@@ -981,23 +990,13 @@ if [ %{include_debug_build} -eq 0 -a  %{include_normal_build} -eq 0 ] ; then
   echo "you have disabled both include_debug_build and include_debug_build. no go."
   exit 13
 fi
-%setup -q -c -n %{uniquesuffix ""} -T -a 0
+%setup -q -c -n %{uniquesuffix ""} -T -a %{openjdk_sourceid}
 # https://bugzilla.redhat.com/show_bug.cgi?id=1189084
 prioritylength=`expr length %{priority}`
 if [ $prioritylength -ne 7 ] ; then
  echo "priority must be 7 digits in total, violated"
  exit 14
 fi
-# For old patches
-# Swap HotSpot for AArch64 port
-%ifarch %{aarch64}
-#pushd openjdk
-#rm -r hotspot
-# tmp - containing whole aarch64 forest
-rm -r openjdk
-tar xf %{SOURCE1}
-#popd
-%endif
 ln -s openjdk jdk8
 
 cp %{SOURCE2} .
@@ -1159,7 +1158,7 @@ bash ../../configure \
     --with-libjpeg=system \
     --with-giflib=system \
     --with-libpng=system \
-    --with-lcms=system \
+    --with-lcms=bundled \
     --with-stdc++lib=dynamic \
     --with-extra-cxxflags="$EXTRA_CPP_FLAGS" \
     --with-extra-cflags="$EXTRA_CFLAGS" \
@@ -1744,6 +1743,14 @@ end
 %endif
 
 %changelog
+* Mon Oct 19 2015 Jiri Vanek <jvanek@redhat.com> - 1:1.8.0.65-3.b17
+- moved to bundled lcms
+- October 2015 security update to u65b17.
+- Add script for generating OpenJDK tarballs from a local Mercurial tree.
+- Update RH1191652 patch to build against current AArch64 tree.
+- Use appropriate source ID to avoid unpacking both tarballs on AArch64.
+- Add MD5 checksums for java.security from 8u51 and 8u60 RPMs.
+
 * Thu Aug 27 2015 Jiri Vanek <jvanek@redhat.com> - 1:1.8.0.60-14.b24
 - updated aarch64 tarball to contain whole forest of latest jdk8-aarch64-jdk8u60-b24.2.tar.xz
 - using this forest instead of only hotspot
