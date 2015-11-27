@@ -125,8 +125,8 @@
 %global origin          openjdk
 %global updatever       65
 %global buildver        b17
-%global aarch64_updatever 65
-%global aarch64_buildver b17
+%global aarch64_updatever %{updatever}
+%global aarch64_buildver  %{buildver}
 %global aarch64_changesetid aarch64-jdk8u%{aarch64_updatever}-%{aarch64_buildver}
 # priority must be 7 digits in total
 %global priority        18000%{updatever}
@@ -206,9 +206,14 @@ fi
 %endif
 %endif
 
+PRIORITY=%{priority}
+if [ "%1" == %{debug_suffix} ]; then
+  let PRIORITY=PRIORITY-1
+fi
+
 ext=.gz
 alternatives \\
-  --install %{_bindir}/java java %{jrebindir %%1}/java %{priority} \\
+  --install %{_bindir}/java java %{jrebindir %%1}/java $PRIORITY  --family %{name} \\
   --slave %{_jvmdir}/jre jre %{_jvmdir}/%{jredir %%1} \\
   --slave %{_jvmjardir}/jre jre_exports %{_jvmjardir}/%{jrelnk %%1} \\
   --slave %{_bindir}/jjs jjs %{jrebindir %%1}/jjs \\
@@ -219,12 +224,12 @@ alternatives \\
   --slave %{_bindir}/rmiregistry rmiregistry %{jrebindir %%1}/rmiregistry \\
   --slave %{_bindir}/servertool servertool %{jrebindir %%1}/servertool \\
   --slave %{_bindir}/tnameserv tnameserv %{jrebindir %%1}/tnameserv \\
+  --slave %{_bindir}/policytool policytool %{jrebindir %%1}/policytool \\
   --slave %{_bindir}/unpack200 unpack200 %{jrebindir %%1}/unpack200 \\
   --slave %{_mandir}/man1/java.1$ext java.1$ext \\
   %{_mandir}/man1/java-%{uniquesuffix %%1}.1$ext \\
   --slave %{_mandir}/man1/jjs.1$ext jjs.1$ext \\
   %{_mandir}/man1/jjs-%{uniquesuffix %%1}.1$ext \\
-  --slave %{_bindir}/policytool policytool %{jrebindir %%1}/policytool \\
   --slave %{_mandir}/man1/keytool.1$ext keytool.1$ext \\
   %{_mandir}/man1/keytool-%{uniquesuffix %%1}.1$ext \\
   --slave %{_mandir}/man1/orbd.1$ext orbd.1$ext \\
@@ -239,18 +244,20 @@ alternatives \\
   %{_mandir}/man1/servertool-%{uniquesuffix %%1}.1$ext \\
   --slave %{_mandir}/man1/tnameserv.1$ext tnameserv.1$ext \\
   %{_mandir}/man1/tnameserv-%{uniquesuffix %%1}.1$ext \\
+  --slave %{_mandir}/man1/policytool.1$ext policytool.1$ext \\
+  %{_mandir}/man1/policytool-%{uniquesuffix %%1}.1$ext \\
   --slave %{_mandir}/man1/unpack200.1$ext unpack200.1$ext \\
   %{_mandir}/man1/unpack200-%{uniquesuffix %%1}.1$ext
 
 for X in %{origin} %{javaver} ; do
   alternatives \\
     --install %{_jvmdir}/jre-"$X" \\
-    jre_"$X" %{_jvmdir}/%{jredir %%1} %{priority} \\
+    jre_"$X" %{_jvmdir}/%{jredir %%1} $PRIORITY  --family %{name} \\
     --slave %{_jvmjardir}/jre-"$X" \\
     jre_"$X"_exports %{_jvmdir}/%{jredir %%1}
 done
 
-update-alternatives --install %{_jvmdir}/jre-%{javaver}-%{origin} jre_%{javaver}_%{origin} %{_jvmdir}/%{jrelnk %%1} %{priority} \\
+update-alternatives --install %{_jvmdir}/jre-%{javaver}-%{origin} jre_%{javaver}_%{origin} %{_jvmdir}/%{jrelnk %%1} $PRIORITY  --family %{name} \\
 --slave %{_jvmjardir}/jre-%{javaver}       jre_%{javaver}_%{origin}_exports      %{jvmjardir %%1}
 
 update-desktop-database %{_datadir}/applications &> /dev/null || :
@@ -280,9 +287,15 @@ exit 0
 }
 
 %global post_devel() %{expand:
+
+PRIORITY=%{priority}
+if [ "%1" == %{debug_suffix} ]; then
+  let PRIORITY=PRIORITY-1
+fi
+
 ext=.gz
 alternatives \\
-  --install %{_bindir}/javac javac %{sdkbindir %%1}/javac %{priority} \\
+  --install %{_bindir}/javac javac %{sdkbindir %%1}/javac $PRIORITY  --family %{name} \\
   --slave %{_jvmdir}/java java_sdk %{_jvmdir}/%{sdkdir %%1} \\
   --slave %{_jvmjardir}/java java_sdk_exports %{_jvmjardir}/%{sdkdir %%1} \\
   --slave %{_bindir}/appletviewer appletviewer %{sdkbindir %%1}/appletviewer \\
@@ -359,8 +372,6 @@ alternatives \\
   %{_mandir}/man1/jstatd-%{uniquesuffix %%1}.1$ext \\
   --slave %{_mandir}/man1/native2ascii.1$ext native2ascii.1$ext \\
   %{_mandir}/man1/native2ascii-%{uniquesuffix %%1}.1$ext \\
-  --slave %{_mandir}/man1/policytool.1$ext policytool.1$ext \\
-  %{_mandir}/man1/policytool-%{uniquesuffix %%1}.1$ext \\
   --slave %{_mandir}/man1/rmic.1$ext rmic.1$ext \\
   %{_mandir}/man1/rmic-%{uniquesuffix %%1}.1$ext \\
   --slave %{_mandir}/man1/schemagen.1$ext schemagen.1$ext \\
@@ -377,12 +388,12 @@ alternatives \\
 for X in %{origin} %{javaver} ; do
   alternatives \\
     --install %{_jvmdir}/java-"$X" \\
-    java_sdk_"$X" %{_jvmdir}/%{sdkdir %%1} %{priority} \\
+    java_sdk_"$X" %{_jvmdir}/%{sdkdir %%1} $PRIORITY  --family %{name} \\
     --slave %{_jvmjardir}/java-"$X" \\
     java_sdk_"$X"_exports %{_jvmjardir}/%{sdkdir %%1}
 done
 
-update-alternatives --install %{_jvmdir}/java-%{javaver}-%{origin} java_sdk_%{javaver}_%{origin} %{_jvmdir}/%{sdkdir %%1} %{priority} \\
+update-alternatives --install %{_jvmdir}/java-%{javaver}-%{origin} java_sdk_%{javaver}_%{origin} %{_jvmdir}/%{sdkdir %%1} $PRIORITY  --family %{name} \\
 --slave %{_jvmjardir}/java-%{javaver}-%{origin}       java_sdk_%{javaver}_%{origin}_exports      %{_jvmjardir}/%{sdkdir %%1}
 
 update-desktop-database %{_datadir}/applications &> /dev/null || :
@@ -411,9 +422,15 @@ exit 0
 }
 
 %global post_javadoc() %{expand:
+
+PRIORITY=%{priority}
+if [ "%1" == %{debug_suffix} ]; then
+  let PRIORITY=PRIORITY-1
+fi
+
 alternatives \\
   --install %{_javadocdir}/java javadocdir %{_javadocdir}/%{uniquejavadocdir %%1}/api \\
-  %{priority}
+  $PRIORITY  --family %{name} 
 exit 0
 }
 
@@ -456,8 +473,8 @@ exit 0
 %{_mandir}/man1/servertool-%{uniquesuffix %%1}.1*
 %{_mandir}/man1/tnameserv-%{uniquesuffix %%1}.1*
 %{_mandir}/man1/unpack200-%{uniquesuffix %%1}.1*
+%{_mandir}/man1/policytool-%{uniquesuffix %%1}.1*
 %config(noreplace) %{_jvmdir}/%{jredir %%1}/lib/security/nss.cfg
-%{_jvmdir}/%{jredir %%1}/lib/audio/
 %ifarch %{jit_arches}
 %ifnarch %{power64}
 %attr(664, root, root) %ghost %{_jvmdir}/%{jredir %%1}/lib/%{archinstall}/server/classes.jsa
@@ -504,7 +521,6 @@ exit 0
 %{_mandir}/man1/jstat-%{uniquesuffix %%1}.1*
 %{_mandir}/man1/jstatd-%{uniquesuffix %%1}.1*
 %{_mandir}/man1/native2ascii-%{uniquesuffix %%1}.1*
-%{_mandir}/man1/policytool-%{uniquesuffix %%1}.1*
 %{_mandir}/man1/rmic-%{uniquesuffix %%1}.1*
 %{_mandir}/man1/schemagen-%{uniquesuffix %%1}.1*
 %{_mandir}/man1/serialver-%{uniquesuffix %%1}.1*
@@ -580,8 +596,12 @@ Requires: tzdata-java >= 2015d
 Requires: lksctp-tools
 # Post requires alternatives to install tool alternatives.
 Requires(post):   %{_sbindir}/alternatives
+# in version 1.7 and higher for --family switch
+Requires(post):   chkconfig >= 1.7
 # Postun requires alternatives to uninstall tool alternatives.
 Requires(postun): %{_sbindir}/alternatives
+# in version 1.7 and higher for --family switch
+Requires(postun):   chkconfig >= 1.7
 
 # Standard JPackage base provides.
 Provides: jre-%{javaver}-%{origin}-headless%1 = %{epoch}:%{version}-%{release}
@@ -612,8 +632,12 @@ Requires:         %{name}%1 = %{epoch}:%{version}-%{release}
 OrderWithRequires: %{name}-headless%1 = %{epoch}:%{version}-%{release}
 # Post requires alternatives to install tool alternatives.
 Requires(post):   %{_sbindir}/alternatives
+# in version 1.7 and higher for --family switch
+Requires(post):   chkconfig >= 1.7
 # Postun requires alternatives to uninstall tool alternatives.
 Requires(postun): %{_sbindir}/alternatives
+# in version 1.7 and higher for --family switch
+Requires(postun):   chkconfig >= 1.7
 
 # Standard JPackage devel provides.
 Provides: java-sdk-%{javaver}-%{origin}%1 = %{epoch}:%{version}
@@ -640,8 +664,12 @@ Obsoletes: java-1.7.0-openjdk-demo%1
 OrderWithRequires: %{name}-headless%1 = %{epoch}:%{version}-%{release}
 # Post requires alternatives to install javadoc alternative.
 Requires(post):   %{_sbindir}/alternatives
+# in version 1.7 and higher for --family switch
+Requires(post):   chkconfig >= 1.7
 # Postun requires alternatives to uninstall javadoc alternative.
 Requires(postun): %{_sbindir}/alternatives
+# in version 1.7 and higher for --family switch
+Requires(postun):   chkconfig >= 1.7
 
 # Standard JPackage javadoc provides.
 Provides: java-javadoc%1 = %{epoch}:%{version}-%{release}
@@ -670,7 +698,7 @@ Obsoletes: java-1.7.0-openjdk-accessibility%1
 
 Name:    java-%{javaver}-%{origin}
 Version: %{javaver}.%{updatever}
-Release: 3.%{buildver}%{?dist}
+Release: 4.%{buildver}%{?dist}
 # java-1.5.0-ibm from jpackage.org set Epoch to 1 for unknown reasons,
 # and this change was brought into RHEL-4.  java-1.5.0-ibm packages
 # also included the epoch in their virtual provides.  This created a
@@ -767,7 +795,7 @@ Patch600: %{name}-rh1191652-hotspot.patch
 Patch601: %{name}-rh1191652-root.patch
 Patch602: %{name}-rh1191652-jdk.patch
 Patch603: %{name}-rh1191652-hotspot-aarch64.patch
-
+Patch605: soundFontPatch.patch
 Patch9999: enableArm64.patch
 
 BuildRequires: autoconf
@@ -997,6 +1025,7 @@ if [ $prioritylength -ne 7 ] ; then
  echo "priority must be 7 digits in total, violated"
  exit 14
 fi
+# For old patches
 ln -s openjdk jdk8
 
 cp %{SOURCE2} .
@@ -1022,9 +1051,6 @@ sh %{SOURCE12}
 %patch201
 %patch202
 %patch203
-
-%ifnarch %{aarch64}
-%endif
 
 %patch1
 %patch3
@@ -1056,6 +1082,7 @@ sh %{SOURCE12}
 %patch601
 %patch602
 %endif
+%patch605
 
 %patch504
 %patch511
@@ -1242,11 +1269,6 @@ rm -rf $RPM_BUILD_ROOT
 STRIP_KEEP_SYMTAB=libjvm*
 
 for suffix in %{build_loop} ; do
-# Install symlink to default soundfont
-install -d -m 755 $RPM_BUILD_ROOT%{_jvmdir}/%{jredir $suffix}/lib/audio
-pushd $RPM_BUILD_ROOT%{_jvmdir}/%{jredir $suffix}/lib/audio
-ln -s %{_datadir}/soundfonts/default.sf2
-popd
 
 pushd %{buildoutputdir  $suffix}/images/%{j2sdkimage}
 
@@ -1743,6 +1765,16 @@ end
 %endif
 
 %changelog
+* Fri Nov 27 2015 Jiri Vanek <jvanek@redhat.com> - 1:1.8.0.65-4.b17
+- partial sync with rawhide
+- priority of debug subpackages lowered by one
+- policytool man page followed policytool to jre
+- adapted to --family switch from new alternatives
+ - depends on chkconfig >= 1.7
+- removed soundfont dangling symlink and repalced by usptream patch
+ - added patch605 soundFontPatch.patch
+
+
 * Mon Oct 19 2015 Jiri Vanek <jvanek@redhat.com> - 1:1.8.0.65-3.b17
 - moved to bundled lcms
 - October 2015 security update to u65b17.
