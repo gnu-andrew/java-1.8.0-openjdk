@@ -705,7 +705,7 @@ Obsoletes: java-1.7.0-openjdk-accessibility%1
 
 Name:    java-%{javaver}-%{origin}
 Version: %{javaver}.%{updatever}
-Release: 5.%{buildver}%{?dist}
+Release: 6.%{buildver}%{?dist}
 # java-1.5.0-ibm from jpackage.org set Epoch to 1 for unknown reasons,
 # and this change was brought into RHEL-4.  java-1.5.0-ibm packages
 # also included the epoch in their virtual provides.  This created a
@@ -1158,7 +1158,9 @@ export ARCH_DATA_MODEL=64
 export CFLAGS="$CFLAGS -mieee"
 %endif
 
-EXTRA_CFLAGS="%ourflags"
+# We use ourcppflags because the OpenJDK build seems to
+# pass these to the HotSpot C++ compiler...
+EXTRA_CFLAGS="%ourcppflags"
 # Disable various optimizations to fix miscompliation. See:
 # - https://bugzilla.redhat.com/show_bug.cgi?id=1120792
 EXTRA_CPP_FLAGS="%ourcppflags -fno-tree-vrp"
@@ -1784,6 +1786,10 @@ end
 %endif
 
 %changelog
+* Tue Dec 08 2015 Andrew Hughes <gnu.andrew@redhat.com> - 1:1.8.0.65-6.b17
+- Pass ourcppflags to the OpenJDK build cflags as it wrongly uses them for the HotSpot C++ build.
+- Resolves: rhbz#1283949
+
 * Tue Dec 08 2015 Andrew Hughes <gnu.andrew@redhat.com> - 1:1.8.0.65-5.b17
 - Define our own optimisation flags based on the optflags macro and pass to OpenJDK build cflags/cxxflags.
 - Remove -fno-devirtualize as we are now on GCC 5 where the GCC bug it worked around is fixed.
