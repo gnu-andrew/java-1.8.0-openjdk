@@ -705,7 +705,7 @@ Obsoletes: java-1.7.0-openjdk-accessibility%1
 
 Name:    java-%{javaver}-%{origin}
 Version: %{javaver}.%{updatever}
-Release: 6.%{buildver}%{?dist}
+Release: 7.%{buildver}%{?dist}
 # java-1.5.0-ibm from jpackage.org set Epoch to 1 for unknown reasons,
 # and this change was brought into RHEL-4.  java-1.5.0-ibm packages
 # also included the epoch in their virtual provides.  This created a
@@ -759,59 +759,66 @@ Source101: config.sub
 
 # RPM/distribution specific patches
 
+# Accessibility patches
 # Ignore AWTError when assistive technologies are loaded 
 Patch1:   %{name}-accessible-toolkit.patch
-
 # Restrict access to java-atk-wrapper classes
 Patch3: java-atk-wrapper-security.patch
-# RHBZ 808293
-Patch4: %{name}-PStack-808293.patch
-# Allow multiple initialization of PKCS11 libraries
+
+# Upstreamable patches
+# PR2737: Allow multiple initialization of PKCS11 libraries
 Patch5: multiple-pkcs11-library-init.patch
-# Include all sources in src.zip
-Patch7: include-all-srcs.patch
-# Problem discovered with make 4.0
-Patch12: removeSunEcProvider-RH1154143.patch
-Patch13: libjpeg-turbo-1.4-compat.patch
+# PR2428: OpenJDK build can't handle commas in LDFLAGS
+Patch501: pr2428.patch
+# PR2095, RH1163501: 2048-bit DH upper bound too small for Fedora infrastructure (sync with IcedTea 2.x)
+Patch504: rh1163501.patch
+# S4890063, PR2304, RH1214835: HPROF: default text truncated when using doe=n option
+Patch511: rh1214835.patch
 
-#
-# OpenJDK specific patches
-#
-
+# Arch-specific upstreamable patches
 # JVM heap size changes for s390 (thanks to aph)
 Patch100: %{name}-s390-java-opts.patch
 # Type fixing for s390
 Patch102: %{name}-size_t.patch
+# S8073139, RH1191652; fix name of ppc64le architecture
+# http://mail.openjdk.java.net/pipermail/hotspot-dev/2015-December/021059.html
+Patch600: %{name}-rh1191652-hotspot.patch
+Patch601: %{name}-rh1191652-root.patch
+Patch602: %{name}-rh1191652-jdk.patch
+Patch603: %{name}-rh1191652-jdk-aarch64.patch
+Patch604: %{name}-rh1191652-hotspot-aarch64.patch
 
-Patch201: system-libjpeg.patch
+# Patches which need backporting to 8u
+# Include all sources in src.zip (8044235: src.zip should include all sources)
+Patch7: include-all-srcs.patch
+# 8035341: Allow using a system installed libpng
 Patch202: system-libpng.patch
+# 8042159: Allow using a system-installed lcms2
 Patch203: system-lcms.patch
-
-Patch300: jstack-pr1845.patch
-
-# Fixes StackOverflowError on ARM32 bit Zero. See RHBZ#1206656
-Patch403: rhbz1206656_fix_current_stack_pointer.patch
-
-# PR2428: OpenJDK build can't handle commas in LDFLAGS
-Patch501: pr2428.patch
 # PR2462: Backport "8074839: Resolve disabled warnings for libunpack and the unpack200 binary"
 # This fixes printf warnings that lead to build failure with -Werror=format-security from optflags
 Patch502: pr2462-01.patch
 Patch503: pr2462-02.patch
-# PR2095, RH1163501: 2048-bit DH upper bound too small for Fedora infrastructure (sync with IcedTea 2.x)
-Patch504: rh1163501.patch
-# S8143855: Bad printf formatting in frame_zero.cpp (upstream from u76)
-Patch505: 8143855.patch
-# S4890063, PR2304, RH1214835: HPROF: default text truncated when using doe=n option (upstreaming post-CPU 2015/07)
-Patch511: rh1214835.patch
-
-# RH1191652; fix name of ppc64le architecture
-Patch600: %{name}-rh1191652-hotspot.patch
-Patch601: %{name}-rh1191652-root.patch
-Patch602: %{name}-rh1191652-jdk.patch
-Patch603: %{name}-rh1191652-hotspot-aarch64.patch
+# S8140620, PR2769: Find and load default.sf2 as the default soundbank on Linux
 Patch605: soundFontPatch.patch
-Patch9999: enableArm64.patch
+
+# Patches upstream and appearing in 8u76
+# Fixes StackOverflowError on ARM32 bit Zero. See RHBZ#1206656
+# 8087120: [GCC5] java.lang.StackOverflowError on Zero JVM initialization on non x86 platforms
+Patch403: rhbz1206656_fix_current_stack_pointer.patch
+# S8143855: Bad printf formatting in frame_zero.cpp
+Patch505: 8143855.patch
+
+# Patches ineligible for 8u
+# 8043805: Allow using a system-installed libjpeg
+Patch201: system-libjpeg.patch
+
+# Local fixes
+# Turns off ECC support as we don't ship the SunEC provider currently
+Patch12: removeSunEcProvider-RH1154143.patch
+
+# Non-OpenJDK fixes
+Patch300: jstack-pr1845.patch
 
 BuildRequires: autoconf
 BuildRequires: automake
@@ -1057,23 +1064,15 @@ cp %{SOURCE101} openjdk/common/autoconf/build-aux/
 # Remove libraries that are linked
 sh %{SOURCE12}
 
-#pure aarch64 forest does not have them
-%ifnarch %{aarch64}
-# Add AArch64 support to configure & JDK build
-%patch9999
-%endif
-
 %patch201
 %patch202
 %patch203
 
 %patch1
 %patch3
-%patch4
 %patch5
 %patch7
 %patch12
-%patch13
 
 # s390 build fixes
 %ifarch s390
@@ -1085,18 +1084,17 @@ sh %{SOURCE12}
 %patch403
 
 # HotSpot ppc64le patch is different depending
-# on whether we are using 2.5 or 2.6 HotSpot.
+# on whether we are using upstream or AArch64 HotSpot.
+%patch601
 %ifarch %{aarch64}
 %patch603
+%patch604
 %else
 %patch600
-%endif
-
-#pure aarch64 forest does not have them
-%ifnarch %{aarch64}
-%patch601
 %patch602
 %endif
+
+
 %patch605
 
 %patch501
@@ -1786,6 +1784,10 @@ end
 %endif
 
 %changelog
+* Wed Dec 09 2015 Andrew Hughes <gnu.andrew@redhat.com> - 1:1.8.0.65-7.b17
+- Remove PStack-808293, libjpeg-turbo-1.4-compat and enableArm64 patches which are no longer needed.
+- Document remaining patches and sort into sections as regards upstream progress.
+
 * Tue Dec 08 2015 Andrew Hughes <gnu.andrew@redhat.com> - 1:1.8.0.65-6.b17
 - Pass ourcppflags to the OpenJDK build cflags as it wrongly uses them for the HotSpot C++ build.
 - Resolves: rhbz#1283949

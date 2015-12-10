@@ -1,25 +1,27 @@
---- openjdk/jdk/make/lib/SoundLibraries.gmk	Fri Dec 04 15:52:11 2015 +0000
-+++ openjdk/jdk/make/lib/SoundLibraries.gmk	Wed Dec 09 20:10:14 2015 +0000
-@@ -139,6 +139,10 @@
-   ifeq ($(OPENJDK_TARGET_CPU), ppc64)
+--- openjdk/jdk/make/lib/SoundLibraries.gmk.orig	2015-03-03 20:52:33.000000000 -0500
++++ openjdk/jdk/make/lib/SoundLibraries.gmk	2015-03-03 20:54:39.000000000 -0500
+@@ -140,6 +140,10 @@
         LIBJSOUND_CFLAGS += -DX_ARCH=X_PPC64
    endif
-+ 
+ 
 +  ifeq ($(OPENJDK_TARGET_CPU), ppc64le)
 +       LIBJSOUND_CFLAGS += -DX_ARCH=X_PPC64LE
 +  endif
- endif
- 
- LIBJSOUND_CFLAGS += -DEXTRA_SOUND_JNI_LIBS='"$(EXTRA_SOUND_JNI_LIBS)"'
-diff -r 87c95759b92b src/share/native/com/sun/media/sound/SoundDefs.h
---- openjdk/jdk/src/share/native/com/sun/media/sound/SoundDefs.h	Wed Feb 11 18:55:05 2015 -0800
-+++ openjdk/jdk/src/share/native/com/sun/media/sound/SoundDefs.h	Tue Feb 17 18:25:01 2015 +0000
-@@ -43,6 +43,8 @@
++
+   ifeq ($(OPENJDK_TARGET_CPU), aarch64)
+ 	LIBJSOUND_CFLAGS += -DX_ARCH=X_AARCH64
+   endif
+diff -r d000047a2d36 src/share/native/com/sun/media/sound/SoundDefs.h
+--- openjdk/jdk/src/share/native/com/sun/media/sound/SoundDefs.h	Thu Oct 15 03:31:36 2015 +0100
++++ openjdk/jdk/src/share/native/com/sun/media/sound/SoundDefs.h	Wed Dec 09 20:49:57 2015 +0000
+@@ -43,7 +43,9 @@
  #define X_ZERO          6
  #define X_ARM           7
  #define X_PPC           8
+-#define X_AARCH64	9
 +#define X_PPC64         9
-+#define X_PPC64LE      10
++#define X_PPC64LE       10
++#define X_AARCH64       11
  
  // **********************************
  // Make sure you set X_PLATFORM and X_ARCH defines correctly.
