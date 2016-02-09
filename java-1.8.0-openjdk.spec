@@ -47,6 +47,9 @@
 %global targets all
 %endif
 
+# If runtests is 0, test suites will not be run.
+%global runtests 0
+
 %global aarch64         aarch64 arm64 armv8
 # sometimes we need to distinguish big and little endian PPC64
 %global ppc64le         ppc64le
@@ -768,7 +771,7 @@ Source2:  README.src
 # Systemtap tapsets. Zipped up to keep it small.
 Source8: systemtap-tapset.tar.gz
 
-# Desktop files. Adapated from IcedTea.
+# Desktop files. Adapted from IcedTea.
 Source9: jconsole.desktop.in
 Source10: policytool.desktop.in
 
@@ -1313,6 +1316,40 @@ $JAVA_HOME/bin/javap -l java.lang.Object | grep LocalVariableTable
 $JAVA_HOME/bin/javap -l java.nio.ByteBuffer | grep "Compiled from"
 $JAVA_HOME/bin/javap -l java.nio.ByteBuffer | grep LineNumberTable
 $JAVA_HOME/bin/javap -l java.nio.ByteBuffer | grep LocalVariableTable
+
+%if %{runtests}
+# Run jtreg test suite.
+{
+  echo ====================JTREG TESTING========================
+  export DISPLAY=:20
+  Xvfb :20 -screen 0 1x1x24 -ac&
+  echo $! > Xvfb.pid
+  make jtregcheck -k
+  kill -9 `cat Xvfb.pid`
+  unset DISPLAY
+  rm -f Xvfb.pid
+  echo ====================JTREG TESTING END====================
+} || :
+
+# Run Mauve test suite.
+{
+  pushd mauve-%{mauvedate}
+    ./configure
+    make
+    echo ====================MAUVE TESTING========================
+    export DISPLAY=:20
+    Xvfb :20 -screen 0 1x1x24 -ac&
+    echo $! > Xvfb.pid
+    $JAVA_HOME/bin/java Harness -vm $JAVA_HOME/bin/java \
+      -file %{SOURCE4} -timeout 30000 2>&1 | tee mauve_output
+    kill -9 `cat Xvfb.pid`
+    unset DISPLAY
+    rm -f Xvfb.pid
+    echo ====================MAUVE TESTING END====================
+  popd
+} || :
+%endif
+
 done
 
 %install
