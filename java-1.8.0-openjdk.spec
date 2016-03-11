@@ -85,6 +85,8 @@
 #looks liekopenjdk RPM specific bug
 # Always set this so the nss.cfg file is not broken
 %global NSS_LIBDIR %(pkg-config --variable=libdir nss)
+%global NSS_LIBS %(pkg-config --libs nss)
+%global NSS_CFLAGS %(pkg-config --cflags nss-softokn)
 
 # fix for https://bugzilla.redhat.com/show_bug.cgi?id=1111349
 %global _privatelibs libmawt[.]so.*
@@ -153,7 +155,7 @@
 # note, following three variables are sedded from update_sources if used correctly. Hardcode them rather there.
 %global project         aarch64-port
 %global repo            jdk8u
-%global revision        aarch64-jdk8u72-b15
+%global revision        aarch64-jdk8u72-b16
 # eg # jdk8u60-b27 -> jdk8u60 or # aarch64-jdk8u60-b27 -> aarch64-jdk8u60  (dont forget spec escape % by %%)
 %global whole_update    %(VERSION=%{revision}; echo ${VERSION%%-*})
 # eg  jdk8u60 -> 60 or aarch64-jdk8u60 -> 60
@@ -738,7 +740,7 @@ Obsoletes: java-1.7.0-openjdk-accessibility%1
 
 Name:    java-%{javaver}-%{origin}
 Version: %{javaver}.%{updatever}
-Release: 5.%{buildver}%{?dist}
+Release: 13.%{buildver}%{?dist}
 # java-1.5.0-ibm from jpackage.org set Epoch to 1 for unknown reasons,
 # and this change was brought into RHEL-4.  java-1.5.0-ibm packages
 # also included the epoch in their virtual provides.  This created a
@@ -758,9 +760,10 @@ URL:      http://openjdk.java.net/
 
 # aarch64-port now contains integration forest of both aarch64 and normal jdk
 # Source from upstream OpenJDK8 project. To regenerate, use
-# VERSION=aarch64-jdk8u71-b15 FILE_NAME_ROOT=${VERSION}
+# VERSION=aarch64-jdk8u72-b16 FILE_NAME_ROOT=aarch64-port-jdk8u-${VERSION}-ec
 # REPO_ROOT=<path to checked-out repository> generate_source_tarball.sh
-Source0: %{project}-%{repo}-%{revision}.tar.xz
+# where the source is obtained from http://hg.openjdk.java.net/%%{project}/%%{repo}
+Source0: %{project}-%{repo}-%{revision}-ec.tar.xz
 
 # Custom README for -src subpackage
 Source2:  README.src
@@ -803,18 +806,34 @@ Patch3: java-atk-wrapper-security.patch
 Patch5: multiple-pkcs11-library-init.patch
 # PR2095, RH1163501: 2048-bit DH upper bound too small for Fedora infrastructure (sync with IcedTea 2.x)
 Patch504: rh1163501.patch
-# S4890063, PR2304, RH1214835: HPROF: default text truncated when using doe=n option (upstreaming post-CPU 2015/07)
+# S4890063, PR2304, RH1214835: HPROF: default text truncated when using doe=n option
 Patch511: rh1214835.patch
 # Turn off strict overflow on IndicRearrangementProcessor{,2}.cpp following 8140543: Arrange font actions
 Patch512: no_strict_overflow.patch
+# Support for building the SunEC provider with the system NSS installation
+# PR1983: Support using the system installation of NSS with the SunEC provider
+# PR2127: SunEC provider crashes when built using system NSS
+# PR2815: Race condition in SunEC provider with system NSS
+Patch513: pr1983-jdk.patch
+Patch514: pr1983-root.patch
+Patch515: pr2127.patch
+Patch516: pr2815.patch
 
 # Arch-specific upstreamable patches
-# JVM heap size changes for s390 (thanks to aph)
+# PR2415: JVM -Xmx requirement is too high on s390
 Patch100: %{name}-s390-java-opts.patch
 # Type fixing for s390
 Patch102: %{name}-size_t.patch
 # Use "%z" for size_t on s390 as size_t != intptr_t
 Patch103: s390-size_t_format_flags.patch
+
+# AArch64-specific upstreamable patches
+# Remove template in AArch64 port which causes issues with GCC 6
+Patch106: remove_aarch64_template_for_gcc6.patch
+
+# AArch64-specific upstreamed patches
+# Remove accidentally included global large code cache changes which break S390
+Patch107: make_reservedcodecachesize_changes_aarch64_only.patch
 
 # Patches which need backporting to 8u
 # S8073139, RH1191652; fix name of ppc64le architecture
@@ -829,13 +848,17 @@ Patch202: system-libpng.patch
 Patch203: system-lcms.patch
 # PR2462: Backport "8074839: Resolve disabled warnings for libunpack and the unpack200 binary"
 # This fixes printf warnings that lead to build failure with -Werror=format-security from optflags
-Patch502: pr2462-01.patch
-Patch503: pr2462-02.patch
+Patch502: pr2462.patch
 # S8140620, PR2769: Find and load default.sf2 as the default soundbank on Linux
+# waiting on upstream: http://mail.openjdk.java.net/pipermail/jdk8u-dev/2016-January/004916.html
 Patch605: soundFontPatch.patch
 # S8148351, PR2842: Only display resolved symlink for compiler, do not change path
 Patch506: pr2842-01.patch
 Patch507: pr2842-02.patch
+# S8150954, RH1176206, PR2866: Taking screenshots on x11 composite desktop produces wrong result
+# In progress: http://mail.openjdk.java.net/pipermail/awt-dev/2016-March/010742.html
+Patch508: rh1176206-jdk.patch
+Patch509: rh1176206-root.patch
 
 # Patches upstream and appearing in 8u76
 # Fixes StackOverflowError on ARM32 bit Zero. See RHBZ#1206656
@@ -849,8 +872,6 @@ Patch505: 8143855.patch
 Patch201: system-libjpeg.patch
 
 # Local fixes
-# Turns off ECC support as we don't ship the SunEC provider currently
-Patch12: removeSunEcProvider-RH1154143.patch
 
 # Non-OpenJDK fixes
 Patch300: jstack-pr1845.patch
@@ -889,6 +910,9 @@ BuildRequires: libffi-devel
 BuildRequires: tzdata-java >= 2015d
 # Earlier versions have a bug in tree vectorization on PPC
 BuildRequires: gcc >= 4.8.3-8
+# Build requirements for SunEC system NSS support
+BuildRequires: nss-softokn-freebl-devel >= 3.16.1
+
 # cacerts build requirement.
 BuildRequires: openssl
 %if %{with_systemtap}
@@ -1106,14 +1130,15 @@ sh %{SOURCE12}
 %patch3
 %patch5
 %patch7
-%patch12
 
 # s390 build fixes
-%ifarch s390
 %patch100
 %patch102
 %patch103
-%endif
+
+# aarch64 build fixes
+%patch106
+%patch107
 
 # Zero PPC fixes.
 %patch403
@@ -1124,13 +1149,18 @@ sh %{SOURCE12}
 %patch605
 
 %patch502
-%patch503
 %patch504
 %patch505
 %patch506
 %patch507
+%patch508
+%patch509
 %patch511
 %patch512
+%patch513
+%patch514
+%patch515
+%patch516
 
 # Extract systemtap tapsets
 %if %{with_systemtap}
@@ -1191,8 +1221,8 @@ export CFLAGS="$CFLAGS -mieee"
 # We use ourcppflags because the OpenJDK build seems to
 # pass EXTRA_CFLAGS to the HotSpot C++ compiler...
 # Explicitly set the C++ standard as the default has changed on GCC >= 6
-EXTRA_CFLAGS="%ourcppflags -std=gnu++98 -Wno-error -fno-delete-null-pointer-checks -fno-guess-branch-probability"
-EXTRA_CPP_FLAGS="%ourcppflags -std=gnu++98 -fno-delete-null-pointer-checks -fno-guess-branch-probability"
+EXTRA_CFLAGS="%ourcppflags -std=gnu++98 -Wno-error -fno-delete-null-pointer-checks -fno-lifetime-dse"
+EXTRA_CPP_FLAGS="%ourcppflags -std=gnu++98 -fno-delete-null-pointer-checks -fno-lifetime-dse"
 %ifarch %{power64} ppc
 # fix rpmlint warnings
 EXTRA_CFLAGS="$EXTRA_CFLAGS -fno-strict-aliasing"
@@ -1213,6 +1243,8 @@ fi
 mkdir -p %{buildoutputdir $suffix}
 pushd %{buildoutputdir $suffix}
 
+NSS_LIBS="%{NSS_LIBS} -lfreebl" \
+NSS_CFLAGS="%{NSS_CFLAGS}" \
 bash ../../configure \
 %ifnarch %{jit_arches}
     --with-jvm-variants=zero \
@@ -1221,12 +1253,10 @@ bash ../../configure \
     --with-milestone="fcs" \
     --with-update-version=%{updatever} \
     --with-build-number=%{buildver} \
-%ifarch %{aarch64}
-    --with-user-release-suffix="aarch64-%{updatever}-%{buildver}" \
-%endif
     --with-boot-jdk=/usr/lib/jvm/java-openjdk \
     --with-debug-level=$debugbuild \
     --enable-unlimited-crypto \
+    --enable-system-nss \
     --with-zlib=system \
     --with-libjpeg=system \
     --with-giflib=system \
@@ -1727,6 +1757,44 @@ require "copy_jdk_configs.lua"
 %endif
 
 %changelog
+* Thu Mar 03 2016 Andrew Hughes <gnu.andrew@redhat.com> - 1:1.8.0.72-13.b16
+- When using a compositing WM, the overlay window should be used, not the root window.
+
+* Mon Feb 29 2016 Omair Majid <omajid@redhat.com> - 1:1.8.0.72-12.b15
+- Use a simple backport for PR2462/8074839.
+- Don't backport the crc check for pack.gz. It's not tested well upstream.
+
+* Mon Feb 29 2016 Andrew Hughes <gnu.andrew@redhat.com> - 1:1.8.0.72-5.b16
+- Fix regression introduced on s390 by large code cache change.
+- Update to u72b16.
+- Drop 8147805 and jvm.cfg fix which are applied upstream.
+
+* Wed Feb 24 2016 Andrew Hughes <gnu.andrew@redhat.com> - 1:1.8.0.72-11.b15
+- Add patches to allow the SunEC provider to be built with the system NSS install.
+- Re-generate source tarball so it includes ecc_impl.h.
+- Adjust tarball generation script to allow ecc_impl.h to be included.
+- Bring over NSS changes from java-1.7.0-openjdk spec file (NSS_CFLAGS/NSS_LIBS)
+- Remove patch which disables the SunEC provider as it is now usable.
+- Correct spelling mistakes in tarball generation script.
+- Move completely unrelated AArch64 gcc 6 patch into separate file.
+- Resolves: rhbz#1019554 (fedora bug)
+
+* Tue Feb 23 2016 jvanek <jvanek@redhat.com> - 1:1.8.0.72-10.b15
+- returning accidentlay removed hunk from renamed and so wrongly merged remove_aarch64_jvm.cfg_divergence.patch
+
+* Mon Feb 22 2016 jvanek <jvanek@redhat.com> - 1:1.8.0.72-9.b15
+- sync from rhel
+
+* Tue Feb 16 2016 Dan Horák <dan[at]danny.cz> - 1:1.8.0.72-8.b15
+- Refresh s390-java-opts patch
+
+* Tue Feb 16 2016 Severin Gehwolf <sgehwolf@redhat.com> - 1:1.8.0.72-7.b15
+- Use -fno-lifetime-dse over -fno-guess-branch-probability.
+  See RHBZ#1306558.
+
+* Mon Feb 15 2016 Severin Gehwolf <sgehwolf@redhat.com> - 1:1.8.0.72-6.b15
+- Add aarch64_FTBFS_rhbz_1307224.patch so as to resolve RHBZ#1307224.
+
 * Fri Feb 12 2016 Severin Gehwolf <sgehwolf@redhat.com> - 1:1.8.0.72-5.b15
 - Add -fno-delete-null-pointer-checks -fno-guess-branch-probability flags to resolve x86/x86_64 crash.
 
