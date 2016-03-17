@@ -740,7 +740,7 @@ Obsoletes: java-1.7.0-openjdk-accessibility%1
 
 Name:    java-%{javaver}-%{origin}
 Version: %{javaver}.%{updatever}
-Release: 13.%{buildver}%{?dist}
+Release: 14.%{buildver}%{?dist}
 # java-1.5.0-ibm from jpackage.org set Epoch to 1 for unknown reasons,
 # and this change was brought into RHEL-4.  java-1.5.0-ibm packages
 # also included the epoch in their virtual provides.  This created a
@@ -818,6 +818,8 @@ Patch513: pr1983-jdk.patch
 Patch514: pr1983-root.patch
 Patch515: pr2127.patch
 Patch516: pr2815.patch
+# S8151841, PR2882, RH1306558: Build needs additional flags to compile with GCC 6
+Patch900: gcc6.patch
 
 # Arch-specific upstreamable patches
 # PR2415: JVM -Xmx requirement is too high on s390
@@ -1162,6 +1164,8 @@ sh %{SOURCE12}
 %patch515
 %patch516
 
+%patch900
+
 # Extract systemtap tapsets
 %if %{with_systemtap}
 tar xzf %{SOURCE8}
@@ -1221,8 +1225,8 @@ export CFLAGS="$CFLAGS -mieee"
 # We use ourcppflags because the OpenJDK build seems to
 # pass EXTRA_CFLAGS to the HotSpot C++ compiler...
 # Explicitly set the C++ standard as the default has changed on GCC >= 6
-EXTRA_CFLAGS="%ourcppflags -std=gnu++98 -Wno-error -fno-delete-null-pointer-checks -fno-lifetime-dse"
-EXTRA_CPP_FLAGS="%ourcppflags -std=gnu++98 -fno-delete-null-pointer-checks -fno-lifetime-dse"
+EXTRA_CFLAGS="%ourcppflags -Wno-error"
+EXTRA_CPP_FLAGS="%ourcppflags"
 %ifarch %{power64} ppc
 # fix rpmlint warnings
 EXTRA_CFLAGS="$EXTRA_CFLAGS -fno-strict-aliasing"
@@ -1757,6 +1761,9 @@ require "copy_jdk_configs.lua"
 %endif
 
 %changelog
+* Fri Mar 11 2016 Andrew Hughes <gnu.andrew@redhat.com> - 1:1.8.0.72-14.b16
+- Replace options for GCC 6 with patch to OpenJDK autoconf to detect and add them
+
 * Thu Mar 03 2016 Andrew Hughes <gnu.andrew@redhat.com> - 1:1.8.0.72-13.b16
 - When using a compositing WM, the overlay window should be used, not the root window.
 

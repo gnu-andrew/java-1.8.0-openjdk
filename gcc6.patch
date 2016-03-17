@@ -1,0 +1,118 @@
+diff -r 86030362b0c5 common/autoconf/hotspot-spec.gmk.in
+--- openjdk/common/autoconf/hotspot-spec.gmk.in	Mon Feb 29 06:45:20 2016 +0000
++++ openjdk/common/autoconf/hotspot-spec.gmk.in	Fri Mar 11 18:01:42 2016 +0000
+@@ -109,7 +109,7 @@
+ MT:=@HOTSPOT_MT@
+ RC:=@HOTSPOT_RC@
+ 
+-EXTRA_CFLAGS=@LEGACY_EXTRA_CFLAGS@
++EXTRA_CFLAGS=@LEGACY_EXTRA_CFLAGS@ $(NO_NULL_POINTER_CHECK_FLAG) $(NO_LIFETIME_DSE_CFLAG) $(CXXSTD_CXXFLAG)
+ EXTRA_CXXFLAGS=@LEGACY_EXTRA_CXXFLAGS@
+ EXTRA_LDFLAGS=@LEGACY_EXTRA_LDFLAGS@
+ 
+diff -r 86030362b0c5 common/autoconf/spec.gmk.in
+--- openjdk/common/autoconf/spec.gmk.in	Mon Feb 29 06:45:20 2016 +0000
++++ openjdk/common/autoconf/spec.gmk.in	Fri Mar 11 18:01:42 2016 +0000
+@@ -320,6 +320,10 @@
+ C_FLAG_DEPS:=@C_FLAG_DEPS@
+ CXX_FLAG_DEPS:=@CXX_FLAG_DEPS@
+ 
++NO_NULL_POINTER_CHECK_FLAG=@NO_NULL_POINTER_CHECK_CFLAG@
++NO_LIFETIME_DSE_CFLAG=@NO_LIFETIME_DSE_CFLAG@
++CXXSTD_CXXFLAG=@CXXSTD_CXXFLAG@
++
+ # Tools that potentially need to be cross compilation aware.
+ CC:=@FIXPATH@ @CCACHE@ @CC@
+ 
+diff -r 86030362b0c5 common/autoconf/toolchain.m4
+--- openjdk/common/autoconf/toolchain.m4	Mon Feb 29 06:45:20 2016 +0000
++++ openjdk/common/autoconf/toolchain.m4	Fri Mar 11 18:01:42 2016 +0000
+@@ -784,6 +784,10 @@
+             CFLAGS_DEBUG_SYMBOLS="-g1"
+             CXXFLAGS_DEBUG_SYMBOLS="-g1"
+           fi
++	  CXXSTD_CXXFLAG="-std=gnu++98"
++	  TOOLCHAIN_CXX_COMPILER_CHECK_ARGUMENTS([$CXXSTD_CXXFLAG -Werror], [], [CXXSTD_CXXFLAG=""])
++	  CXXFLAGS_JDK="${CXXFLAGS_JDK} ${CXXSTD_CXXFLAG}"
++	  AC_SUBST([CXXSTD_CXXFLAG])
+           ;;
+         ossc )
+           #
+@@ -973,6 +977,16 @@
+           CFLAGS_JDK="${CFLAGS_JDK} -fno-strict-aliasing"
+           ;;
+       esac
++      # These flags are required for GCC 6 builds but may not be available on earlier versions
++      NO_NULL_POINTER_CHECK_CFLAG="-fno-delete-null-pointer-checks"
++      TOOLCHAIN_COMPILER_CHECK_ARGUMENTS([$NO_NULL_POINTER_CHECK_CFLAG -Werror], [],
++    					 [NO_NULL_POINTER_CHECK_CFLAG=""])
++      AC_SUBST([NO_NULL_POINTER_CHECK_CFLAG])
++      NO_LIFETIME_DSE_CFLAG="-fno-lifetime-dse"
++      TOOLCHAIN_COMPILER_CHECK_ARGUMENTS([$NO_LIFETIME_DSE_CFLAG -Werror], [],
++    					 [NO_LIFETIME_DSE_CFLAG=""])
++      CFLAGS_JDK="${CFLAGS_JDK} ${NO_NULL_POINTER_CHECK_CFLAG} ${NO_LIFETIME_DSE_CFLAG}"
++      AC_SUBST([NO_LIFETIME_DSE_CFLAG])
+       ;;
+     ossc )
+       CCXXFLAGS_JDK="$CCXXFLAGS $CCXXFLAGS_JDK -DTRACING -DMACRO_MEMSYS_OPS -DBREAKPTS"
+@@ -1200,9 +1214,9 @@
+ #                                   [RUN-IF-FALSE])
+ # ------------------------------------------------------------
+ # Check that the c and c++ compilers support an argument
+-AC_DEFUN([TOOLCHAIN_COMPILER_CHECK_ARGUMENTS],
++AC_DEFUN([TOOLCHAIN_C_COMPILER_CHECK_ARGUMENTS],
+ [
+-  AC_MSG_CHECKING([if compiler supports "$1"])
++  AC_MSG_CHECKING([if the C compiler supports "$1"])
+   supports=yes
+ 
+   saved_cflags="$CFLAGS"
+@@ -1213,6 +1227,19 @@
+   AC_LANG_POP([C])
+   CFLAGS="$saved_cflags"
+ 
++  AC_MSG_RESULT([$supports])
++  if test "x$supports" = "xyes" ; then
++    m4_ifval([$2], [$2], [:])
++  else
++    m4_ifval([$3], [$3], [:])
++  fi
++])
++
++AC_DEFUN([TOOLCHAIN_CXX_COMPILER_CHECK_ARGUMENTS],
++[
++  AC_MSG_CHECKING([if the C++ compiler supports "$1"])
++  supports=yes
++
+   saved_cxxflags="$CXXFLAGS"
+   CXXFLAGS="$CXXFLAG $1"
+   AC_LANG_PUSH([C++])
+@@ -1220,7 +1247,28 @@
+       [supports=no])
+   AC_LANG_POP([C++])
+   CXXFLAGS="$saved_cxxflags"
++  
++  AC_MSG_RESULT([$supports])
++  if test "x$supports" = "xyes" ; then
++    m4_ifval([$2], [$2], [:])
++  else
++    m4_ifval([$3], [$3], [:])
++  fi
++])
+ 
++# TOOLCHAIN_COMPILER_CHECK_ARGUMENTS(ARGUMENT: [ARGUMENT], IF_TRUE: [RUN-IF-TRUE],
++#                                   IF_FALSE: [RUN-IF-FALSE])
++# ------------------------------------------------------------
++# Check that the c and c++ compilers support an argument
++AC_DEFUN([TOOLCHAIN_COMPILER_CHECK_ARGUMENTS],
++[
++  TOOLCHAIN_C_COMPILER_CHECK_ARGUMENTS([$1], [C_COMP_SUPPORTS="yes"], [C_COMP_SUPPORTS="no"])
++  TOOLCHAIN_CXX_COMPILER_CHECK_ARGUMENTS([$1], [CXX_COMP_SUPPORTS="yes"], [CXX_COMP_SUPPORTS="no"])
++
++  AC_MSG_CHECKING([if both compilers support "$1"])
++  supports=no
++  if test "x$C_COMP_SUPPORTS" = "xyes" -a "x$CXX_COMP_SUPPORTS" = "xyes"; then supports=yes; fi
++  
+   AC_MSG_RESULT([$supports])
+   if test "x$supports" = "xyes" ; then
+     m4_ifval([$2], [$2], [:])
